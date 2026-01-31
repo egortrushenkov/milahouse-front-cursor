@@ -3388,7 +3388,7 @@
 
     .contacts__container {
       padding: 0 16px;
-      gap: 24px;
+      gap: 46px;
     }
 
     .contacts__header {
@@ -3402,6 +3402,7 @@
 
     .contacts__description {
       font-size: var(--font-size-xs);
+      margin: 0;
     }
 
     .contacts__phone-number {
@@ -3419,9 +3420,8 @@
 
     .contacts__route-btn,
     .contacts__btn {
-      width: 100%;
       font-size: var(--font-size-xs);
-      padding: 10px 20px;
+      min-height: 0px !important;
     }
 
     .footer__container {
