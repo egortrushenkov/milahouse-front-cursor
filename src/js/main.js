@@ -760,11 +760,101 @@ function initAdvantages() {
   }
 }
 
+const ATTRACTIONS_VISIBLE_DEFAULT = 6;
+
+function escapeHtml(str) {
+  if (str == null) return '';
+  const s = String(str);
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function getAttractionsFromDom() {
+  const dataEl = document.getElementById('attractionsData');
+  if (!dataEl) return [];
+  const imgs = dataEl.querySelectorAll('img');
+  return Array.from(imgs).map((img) => ({
+    id: img.id || '',
+    img: img.src,
+    title: img.alt || img.getAttribute('title') || '',
+  }));
+}
+
+function buildAttractionCard(item, modClass) {
+  const cls = modClass ? ` attraction-item${modClass}` : '';
+  return (
+    '<div class="attraction-item' + cls + '">' +
+    '<div class="attraction-item__img"><img src="' + escapeHtml(item.img) + '" alt="' + escapeHtml(item.title) + '"></div>' +
+    '<div class="attraction-item__content"><div>' + escapeHtml(item.title) + '</div></div>' +
+    '</div>'
+  );
+}
+
+function buildAttractionsDesktopTop(items) {
+  const chunks = [];
+  for (let i = 0; i < items.length; i += 3) {
+    const slice = items.slice(i, i + 3);
+    const cards = slice.map((it) => buildAttractionCard(it, '')).join('');
+    chunks.push('<div class="swiper-slide attraction-grid">' + cards + '</div>');
+  }
+  return chunks.join('');
+}
+
+function buildAttractionsDesktopBottom(items) {
+  const chunks = [];
+  for (let i = 0; i < items.length; i += 3) {
+    const slice = items.slice(i, i + 3);
+    const lg = slice[0] ? buildAttractionCard(slice[0], ' attraction-item--lg') : '';
+    const sm1 = slice[1] ? buildAttractionCard(slice[1], ' attraction-item--sm') : '';
+    const sm2 = slice[2] ? buildAttractionCard(slice[2], ' attraction-item--sm') : '';
+    const smGroup =
+      (sm1 || sm2) ?
+        '<div class="attraction-item--sm--groups">' + sm1 + sm2 + '</div>' :
+        '';
+    chunks.push('<div class="swiper-slide attraction-grid">' + lg + smGroup + '</div>');
+  }
+  return chunks.join('');
+}
+
+function buildAttractionsMobileItems(items, visibleCount) {
+  let html = '';
+  items.forEach((item, index) => {
+    const hidden = index >= visibleCount ? ' attractions__grid-item--hidden' : '';
+    html +=
+      '<div class="attractions__grid-item attractions__grid-item--single' +
+      hidden +
+      '">' +
+      buildAttractionCard(item, '') +
+      '</div>';
+  });
+  return html;
+}
+
 function initAttractions() {
+  const items = getAttractionsFromDom();
+  if (items.length === 0) return;
+
+  const section = document.getElementById('attractions');
+  const visibleCount =
+    parseInt(section.getAttribute('data-attractions-visible'), 10) || ATTRACTIONS_VISIBLE_DEFAULT;
+
+  const topWrapper = document.querySelector('.attraction-swiper-top .swiper-wrapper');
+  const bottomWrapper = document.querySelector('.attraction-swiper-bottom .swiper-wrapper');
   const mobileGrid = document.querySelector('.attractions__grid--mobile');
   const moreBtn = document.getElementById('attractionsMoreBtn');
 
-  // Инициализация кнопки "еще фото" на мобилке
+  if (topWrapper) topWrapper.innerHTML = buildAttractionsDesktopTop(items);
+  if (bottomWrapper) bottomWrapper.innerHTML = buildAttractionsDesktopBottom(items);
+  if (mobileGrid) mobileGrid.innerHTML = buildAttractionsMobileItems(items, visibleCount);
+
+  const moreWrapper = document.querySelector('.attractions__more-wrapper');
+  if (moreWrapper && items.length <= visibleCount) {
+    moreWrapper.style.display = 'none';
+  }
+
   if (moreBtn && mobileGrid) {
     moreBtn.addEventListener('click', function(e) {
       e.preventDefault();
@@ -772,14 +862,15 @@ function initAttractions() {
       if (window.innerWidth <= 768) {
         mobileGrid.classList.add('show-more');
         const hiddenItems = mobileGrid.querySelectorAll('.attractions__grid-item--hidden');
-        hiddenItems.forEach(item => {
+        hiddenItems.forEach((item) => {
           item.style.display = 'flex';
         });
         this.style.display = 'none';
       }
     });
   }
-  
+
+  initAttractionSliders();
 }
 
 function initAttractionSliders() {
@@ -2110,9 +2201,24 @@ function initAdminPanel() {
 function initPreloader() {
   const preloader = document.getElementById('sitePreloader');
   if (!preloader) return;
-  window.addEventListener('load', () => {
-    preloader.classList.add('preloader--hidden');
-  });
+
+  const minDisplayMs = 400; // минимальное время показа, чтобы не было мелькания
+  const startedAt = Date.now();
+
+  function hidePreloader() {
+    const elapsed = Date.now() - startedAt;
+    const delay = Math.max(0, minDisplayMs - elapsed);
+    setTimeout(() => {
+      preloader.classList.add('preloader--hidden');
+    }, delay);
+  }
+
+  // Скрываем по готовности DOM, а не по полной загрузке страницы (load ждёт все картинки/шрифты — на проде может быть 40+ сек)
+  if (document.readyState === 'complete') {
+    hidePreloader();
+  } else {
+    window.addEventListener('DOMContentLoaded', hidePreloader);
+  }
 }
 
 
@@ -2355,7 +2461,7 @@ if (typeof Fancybox !== 'undefined') {
         // Open booking modal after a small delay
         setTimeout(() => {
           Fancybox.show([{
-            src: '/dialogs/booking-modal.html',
+            src: '/ajax/dialogs/booking-modal.php',
             type: 'ajax'
           }], {
             dragToClose: false,
