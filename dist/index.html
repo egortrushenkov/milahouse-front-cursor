@@ -54,14 +54,17 @@
                         <img src="/img/svg/telegram.svg" alt="Telegram">
                     </a>
                     <a href="https://vk.com/milahouse" target="_blank" rel="noopener noreferrer" class="header__messenger-link">
-                        <img src="/img/svg/icon-max.svg" alt="VK">
+                        <img src="/img/svg/icon-max.svg" alt="MAX">
                     </a>
                     <a href="https://wa.me/79181329575" target="_blank" rel="noopener noreferrer" class="header__messenger-link">
                         <img src="/img/svg/icon-whatsapp.svg" alt="WhatsApp">
                     </a>
+                    <a href="https://vk.com/milahouse" target="_blank" rel="noopener noreferrer" class="header__messenger-link">
+                        <img src="/img/svg/vk.svg" alt="VK">
+                    </a>
                 </div>
             </div>
-            <button class="header__booking-btn" data-fancybox-dialog data-src="/dialogs/lead-modal.html">
+            <button class="header__booking-btn" data-fancybox-dialog data-src="/ajax/dialogs/lead-modal.php">
                 <img src="/img/svg/calendar-icon.svg" alt="Календарь">
                 <span>Выбрать номер</span>
             </button>
@@ -105,7 +108,7 @@
                     </a>
                 </div>
             </div>
-            <button class="header__nav-booking" data-fancybox-dialog data-src="/dialogs/lead-modal.html">
+            <button class="header__nav-booking" data-fancybox-dialog data-src="/ajax/dialogs/lead-modal.php">
                 <img src="/img/svg/calendar-icon.svg" alt="Календарь">
                 <span>Выбрать номер</span>
             </button>
@@ -172,7 +175,7 @@
                             </div>
                         </div>
                     </div>
-                    <button type="button" class="hero__form-submit" data-fancybox-dialog data-src="/dialogs/lead-modal.html">Узнать цены</button>
+                    <button type="button" class="hero__form-submit" data-fancybox-dialog data-src="/ajax/dialogs/lead-modal.php">Узнать цены</button>
                 </form>
             </div>
         </div>
@@ -303,11 +306,8 @@
                     </div>
                 </div>
                 <div class="rooms__grid" id="roomsGrid">
-                    <!-- 
-                      data-room-bookings - JSON массив бронирований для конкретного номера
-                      Формат: [{"checkin":"YYYY-MM-DD","checkout":"YYYY-MM-DD","roomId":"N"}]
-                    -->
-                    <div class="rooms__card" data-fancybox-dialog data-src="/dialogs/room-modal.html?roomId=1" data-room-id="1" data-room-capacity="4" data-room-category="family" data-room-bookings='[{"checkin":"2026-02-15","checkout":"2026-02-20","roomId":"1"},{"checkin":"2026-02-25","checkout":"2026-03-01","roomId":"1"}]'>
+
+                    <div class="rooms__card" data-fancybox-dialog data-src="/dialogs/room-modal.html?roomId=1" data-room-id="1" data-room-capacity="4" data-room-category="family">
                         <div class="rooms__card-image-wrapper">
                             <img src="/img/png/room-1.png" alt="Семейный, четырехместный номер Комфорт" class="rooms__card-image" data-room-image>
                             <div class="rooms__card-image-overlay"></div>
@@ -345,7 +345,7 @@
                             <h3 class="rooms__card-title" data-room-title>Четырехместный с балконом</h3>
                         </div>
                     </div>
-                    <div class="rooms__card" data-fancybox-dialog data-src="/dialogs/room-modal.html?roomId=3" data-room-id="3" data-room-capacity="4" data-room-category="4" data-room-bookings='[{"checkin":"2026-04-01","checkout":"2026-04-05","roomId":"3"}]'>
+                    <div class="rooms__card" data-fancybox-dialog data-src="/ajax/dialogs/room-modal.php?roomId=3" data-room-id="3" data-room-capacity="4" data-room-category="4" data-room-bookings='[{"checkin":"2026-04-01","checkout":"2026-04-05","roomId":"3"}]'>
                         <div class="rooms__card-image-wrapper">
                             <img src="/img/png/room-3.png" alt="Четырехместный с балконом" class="rooms__card-image" data-room-image>
                             <div class="rooms__card-image-overlay"></div>
@@ -361,7 +361,7 @@
                             <h3 class="rooms__card-title" data-room-title>Четырехместный с балконом</h3>
                         </div>
                     </div>
-                    <div class="rooms__card" data-fancybox-dialog data-src="/dialogs/room-modal.html?roomId=4" data-room-id="4" data-room-capacity="4" data-room-category="4">
+                    <div class="rooms__card" data-fancybox-dialog data-src="/ajax/dialogs/room-modal.php?roomId=4" data-room-id="4" data-room-capacity="4" data-room-category="4">
                         <div class="rooms__card-image-wrapper">
                             <img src="/img/png/room-4.png" alt="Четырехместный без балкона" class="rooms__card-image" data-room-image>
                             <div class="rooms__card-image-overlay"></div>
@@ -377,7 +377,7 @@
                             <h3 class="rooms__card-title" data-room-title>Четырехместный без балкона</h3>
                         </div>
                     </div>
-                    <div class="rooms__card" data-fancybox-dialog data-src="/dialogs/room-modal.html?roomId=5" data-room-id="5" data-room-capacity="4" data-room-category="4">
+                    <div class="rooms__card" data-fancybox-dialog data-src="/ajax/dialogs/room-modal.php?roomId=5" data-room-id="5" data-room-capacity="4" data-room-category="4">
                         <div class="rooms__card-image-wrapper">
                             <img src="/img/png/room-5.png" alt="Двухкомнатные апартаменты" class="rooms__card-image" data-room-image>
                             <div class="rooms__card-image-overlay"></div>
@@ -393,7 +393,7 @@
                             <h3 class="rooms__card-title" data-room-title>Двухкомнатные апартаменты</h3>
                         </div>
                     </div>
-                    <div class="rooms__card" data-fancybox-dialog data-src="/dialogs/room-modal.html?roomId=6" data-room-id="6" data-room-capacity="4" data-room-category="4">
+                    <div class="rooms__card" data-fancybox-dialog data-src="/ajax/dialogs/room-modal.php?roomId=6" data-room-id="6" data-room-capacity="4" data-room-category="4">
                         <div class="rooms__card-image-wrapper">
                             <img src="/img/png/room-6.png" alt="Четырехместный с балконом" class="rooms__card-image" data-room-image>
                             <div class="rooms__card-image-overlay"></div>
@@ -409,7 +409,7 @@
                             <h3 class="rooms__card-title" data-room-title>Четырехместный с балконом</h3>
                         </div>
                     </div>
-                    <div class="rooms__card" data-fancybox-dialog data-src="/dialogs/room-modal.html?roomId=7" data-room-id="7" data-room-capacity="6" data-room-category="6">
+                    <div class="rooms__card" data-fancybox-dialog data-src="/ajax/dialogs/room-modal.php?roomId=7" data-room-id="7" data-room-capacity="6" data-room-category="6">
                         <div class="rooms__card-image-wrapper">
                             <img src="/img/png/room-7.png" alt="Двухкомнатный шестиместный с балконом" class="rooms__card-image" data-room-image>
                             <div class="rooms__card-image-overlay"></div>
@@ -425,7 +425,7 @@
                             <h3 class="rooms__card-title" data-room-title>Двухкомнатный шестиместный с балконом</h3>
                         </div>
                     </div>
-                    <div class="rooms__card" data-fancybox-dialog data-src="/dialogs/room-modal.html?roomId=8" data-room-id="8" data-room-capacity="4" data-room-category="4">
+                    <div class="rooms__card" data-fancybox-dialog data-src="/ajax/dialogs/room-modal.php?roomId=8" data-room-id="8" data-room-capacity="4" data-room-category="4">
                         <div class="rooms__card-image-wrapper">
                             <img src="/img/png/room-8.png" alt="Двухкомнатные апартаменты" class="rooms__card-image" data-room-image>
                             <div class="rooms__card-image-overlay"></div>
@@ -441,7 +441,7 @@
                             <h3 class="rooms__card-title" data-room-title>Двухкомнатные апартаменты</h3>
                         </div>
                     </div>
-                    <div class="rooms__card" data-fancybox-dialog data-src="/dialogs/room-modal.html?roomId=9" data-room-id="9" data-room-capacity="3" data-room-category="3">
+                    <div class="rooms__card" data-fancybox-dialog data-src="/ajax/dialogs/room-modal.php?roomId=9" data-room-id="9" data-room-capacity="3" data-room-category="3">
                         <div class="rooms__card-image-wrapper">
                             <img src="/img/png/room-1.png" alt="Трехместный с балконом" class="rooms__card-image" data-room-image>
                             <div class="rooms__card-image-overlay"></div>
@@ -775,12 +775,15 @@
         </div>
     </section>
     
-    <!-- Секция достопримечательностей: бэкенд передаёт только контейнер с тегами img (id, src, alt).
-         JS сам строит десктоп-слайдеры и мобильную сетку. data-attractions-visible — сколько карточек видно на мобилке по умолчанию (можно менять). -->
+    <!-- Секция достопримечательностей: бэкенд передаёт два отдельных контейнера с тегами img (id, src, alt).
+         JS сам строит десктоп-слайдеры (верхний из первого массива, нижний из второго) и мобильную сетку (объединяет оба с проверкой на дубликаты). -->
     <section class="attractions" id="attractions" data-attractions-visible="6">
         <div class="attractions__container">
-            <div class="attractions__data" id="attractionsData" aria-hidden="true" style="display: none;">
-                <img id="1" src="https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/1.png" alt="Джиппинг к водопадам"><img id="2" src="https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/11.png" alt="Экскурсии на Абрау-Дюрсо"><img id="3" src="https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/25.png" alt="Завораживающий шоу-парк"><img id="4" src="https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/26.png" alt="Морские прогулки"><img id="5" src="https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/12.png" alt="Кабардинка и сухогруз RIO"><img id="6" src="https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/27.png" alt="Дайвинг с инструктором"><img id="7" src="https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/7.png" alt="Дикий пляж «Сосновка»"><img id="8" src="https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/8.png" alt="Прогулки на квадроциклах"><img id="9" src="https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/9.png" alt="Парк аттракционов"><img id="10" src="https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/1.png" alt="Атмосферный Сафари-Парк"><img id="11" src="https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/2.png" alt="Канатная дорога на смотровую площадку"><img id="12" src="https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/3.png" alt="Конные прогулки в Прасковеевке">
+            <div class="attractions__data" id="attractionsDataTop" aria-hidden="true" style="display: none;">
+                <img id="1" src="https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/1.png" alt="Джиппинг к водопадам"><img id="2" src="https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/11.png" alt="Экскурсии на Абрау-Дюрсо"><img id="3" src="https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/25.png" alt="Завораживающий шоу-парк"><img id="4" src="https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/26.png" alt="Морские прогулки"><img id="5" src="https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/12.png" alt="Кабардинка и сухогруз RIO"><img id="6" src="https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/27.png" alt="Дайвинг с инструктором">
+            </div>
+            <div class="attractions__data" id="attractionsDataBottom" aria-hidden="true" style="display: none;">
+                <img id="7" src="https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/7.png" alt="Дикий пляж «Сосновка»"><img id="8" src="https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/8.png" alt="Прогулки на квадроциклах"><img id="9" src="https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/9.png" alt="Парк аттракционов"><img id="10" src="https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/1.png" alt="Атмосферный Сафари-Парк"><img id="11" src="https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/2.png" alt="Канатная дорога на смотровую площадку"><img id="12" src="https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/3.png" alt="Конные прогулки в Прасковеевке">
             </div>
             <div class="attraction-slider attraction-slider--desktop">
                 <div class="attraction-slider-top">
@@ -850,6 +853,9 @@
                         </a>
                         <a href="https://wa.me/79181329575" target="_blank" rel="noopener noreferrer" class="contacts__messenger-link">
                             <img src="/img/svg/icon-whatsapp.svg" alt="WhatsApp">
+                        </a>
+                        <a href="https://vk.com/milahouse" target="_blank" rel="noopener noreferrer" class="header__messenger-link">
+                            <img src="/img/svg/vk.svg" alt="VK">
                         </a>
                     </div>
                 </div>
@@ -928,7 +934,7 @@
         </div>
     </div>
 
-    <!-- Modals are now loaded via Fancybox from /dialogs/ directory -->
+    <!-- Modals are loaded via Fancybox from /ajax/dialogs/...php -->
 
     <script src="./js/main.js"></script>
 </body>

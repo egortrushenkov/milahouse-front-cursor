@@ -7,13 +7,18 @@
   // ДАННЫЕ ДЛЯ БЭКЕНДЕРА - ДОСТОПРИМЕЧАТЕЛЬНОСТИ
   // Бэкендер может легко изменить этот массив
   // ========================================
-  var attractionsData = [
+
+
+    var attractionsDataTop = [
     { id: 1, img: 'https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/1.png', title: 'Джиппинг к водопадам' },
     { id: 2, img: 'https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/11.png', title: 'Экскурсии на Абрау-Дюрсо' },
     { id: 3, img: 'https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/25.png', title: 'Завораживающий шоу-парк' },
     { id: 4, img: 'https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/26.png', title: 'Морские прогулки' },
     { id: 5, img: 'https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/12.png', title: 'Кабардинка и сухогруз RIO' },
-    { id: 6, img: 'https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/27.png', title: 'Дайвинг с инструктором' },
+    { id: 6, img: 'https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/27.png', title: 'Дайвинг с инструктором' }
+  ];
+  
+  var attractionsDataBottom = [
     { id: 7, img: 'https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/7.png', title: 'Дикий пляж «Сосновка»' },
     { id: 8, img: 'https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/8.png', title: 'Прогулки на квадроциклах' },
     { id: 9, img: 'https://xn----7sbfo4ajeedkpo6k.xn--p1ai/uploads/attraction/compress/9.png', title: 'Парк аттракционов' },
@@ -231,11 +236,8 @@
                     </div>
                 </div>
                 <div class="rooms__grid" id="roomsGrid">
-                    <!-- 
-                      data-room-bookings - JSON массив бронирований для конкретного номера
-                      Формат: [{"checkin":"YYYY-MM-DD","checkout":"YYYY-MM-DD","roomId":"N"}]
-                    -->
-                    <div class="rooms__card" data-fancybox-dialog data-src="/ajax/dialogs/room-modal.php?roomId=1" data-room-id="1" data-room-capacity="4" data-room-category="family" data-room-bookings='[{"checkin":"2026-02-15","checkout":"2026-02-20","roomId":"1"},{"checkin":"2026-02-25","checkout":"2026-03-01","roomId":"1"}]'>
+
+                    <div class="rooms__card" data-fancybox-dialog data-src="/dialogs/room-modal.html?roomId=1" data-room-id="1" data-room-capacity="4" data-room-category="family">
                         <div class="rooms__card-image-wrapper">
                             <img src="/img/png/room-1.png" alt="Семейный, четырехместный номер Комфорт" class="rooms__card-image" data-room-image>
                             <div class="rooms__card-image-overlay"></div>
@@ -257,7 +259,7 @@
                             <h3 class="rooms__card-title" data-room-title>Семейный, четырехместный номер Комфорт</h3>
                         </div>
                     </div>
-                    <div class="rooms__card" data-fancybox-dialog data-src="/ajax/dialogs/room-modal.php?roomId=2" data-room-id="2" data-room-capacity="4" data-room-category="4" data-room-bookings='[{"checkin":"2026-03-10","checkout":"2026-03-15","roomId":"2"}]'>
+                    <div class="rooms__card" data-fancybox-dialog data-src="/dialogs/room-modal.html?roomId=2" data-room-id="2" data-room-capacity="4" data-room-category="4" data-room-bookings='[{"checkin":"2026-03-10","checkout":"2026-03-15","roomId":"2"}]'>
                         <div class="rooms__card-image-wrapper">
                             <img src="/img/png/room-2.png" alt="Четырехместный с балконом" class="rooms__card-image" data-room-image>
                             <div class="rooms__card-image-overlay"></div>
@@ -707,12 +709,15 @@
         </div>
     </section>
     
-    <!-- Секция достопримечательностей: бэкенд передаёт только контейнер с тегами img (id, src, alt).
-         JS сам строит десктоп-слайдеры и мобильную сетку. data-attractions-visible — сколько карточек видно на мобилке по умолчанию (можно менять). -->
+    <!-- Секция достопримечательностей: бэкенд передаёт два отдельных контейнера с тегами img (id, src, alt).
+         JS сам строит десктоп-слайдеры (верхний из первого массива, нижний из второго) и мобильную сетку (объединяет оба с проверкой на дубликаты). -->
     <section class="attractions" id="attractions" data-attractions-visible="<%= typeof attractionsMobileVisible !== 'undefined' ? attractionsMobileVisible : 6 %>">
         <div class="attractions__container">
-            <div class="attractions__data" id="attractionsData" aria-hidden="true" style="display: none;">
-                <% _.forEach(attractionsData, function(item) { %><img id="<%= item.id %>" src="<%= item.img %>" alt="<%= item.title %>"><% }); %>
+            <div class="attractions__data" id="attractionsDataTop" aria-hidden="true" style="display: none;">
+                <% _.forEach(attractionsDataTop, function(item) { %><img id="<%= item.id %>" src="<%= item.img %>" alt="<%= item.title %>"><% }); %>
+            </div>
+            <div class="attractions__data" id="attractionsDataBottom" aria-hidden="true" style="display: none;">
+                <% _.forEach(attractionsDataBottom, function(item) { %><img id="<%= item.id %>" src="<%= item.img %>" alt="<%= item.title %>"><% }); %>
             </div>
             <div class="attraction-slider attraction-slider--desktop">
                 <div class="attraction-slider-top">

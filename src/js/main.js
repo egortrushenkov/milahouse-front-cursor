@@ -772,8 +772,8 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;');
 }
 
-function getAttractionsFromDom() {
-  const dataEl = document.getElementById('attractionsData');
+function getAttractionsFromDom(containerId) {
+  const dataEl = document.getElementById(containerId);
   if (!dataEl) return [];
   const imgs = dataEl.querySelectorAll('img');
   return Array.from(imgs).map((img) => ({
@@ -781,6 +781,20 @@ function getAttractionsFromDom() {
     img: img.src,
     title: img.alt || img.getAttribute('title') || '',
   }));
+}
+
+function mergeAttractionsWithDeduplication(topItems, bottomItems) {
+  const merged = [...topItems];
+  const topIds = new Set(topItems.map(item => item.id));
+  
+  // Добавляем элементы из нижнего массива, пропуская дубликаты по id
+  bottomItems.forEach(item => {
+    if (!topIds.has(item.id)) {
+      merged.push(item);
+    }
+  });
+  
+  return merged;
 }
 
 function buildAttractionCard(item, modClass) {
@@ -819,40 +833,95 @@ function buildAttractionsDesktopBottom(items) {
   return chunks.join('');
 }
 
-function buildAttractionsMobileItems(items, visibleCount) {
+// Мобильная сетка: чередуем 1) два в ряд 50/50, 2) одна на всю ширину, 3) одна высокая слева + две в столбец справа.
+function buildAttractionsMobileItems(items) {
+  if (items.length === 0) return '';
   let html = '';
-  items.forEach((item, index) => {
-    const hidden = index >= visibleCount ? ' attractions__grid-item--hidden' : '';
+  let i = 0;
+  while (i < items.length) {
+    // Блок 1: два в ряд (50/50)
+    if (i + 2 <= items.length) {
+      html +=
+        '<div class="attractions__block attractions__block--pair">' +
+        '<div class="attractions__block-item">' + buildAttractionCard(items[i], '') + '</div>' +
+        '<div class="attractions__block-item">' + buildAttractionCard(items[i + 1], '') + '</div>' +
+        '</div>';
+      i += 2;
+    } else if (i + 1 <= items.length) {
+      html +=
+        '<div class="attractions__block attractions__block--pair">' +
+        '<div class="attractions__block-item">' + buildAttractionCard(items[i], '') + '</div>' +
+        '</div>';
+      i += 1;
+    }
+    if (i >= items.length) break;
+    // Блок 2: одна на всю ширину
     html +=
-      '<div class="attractions__grid-item attractions__grid-item--single' +
-      hidden +
-      '">' +
-      buildAttractionCard(item, '') +
+      '<div class="attractions__block attractions__block--full">' +
+      '<div class="attractions__block-item">' + buildAttractionCard(items[i], '') + '</div>' +
       '</div>';
-  });
+    i += 1;
+    if (i >= items.length) break;
+    // Блок 3: одна высокая слева + две в столбец справа
+    const splitLeft = buildAttractionCard(items[i], '');
+    i += 1;
+    let splitRight = '';
+    if (i < items.length) {
+      splitRight += '<div class="attractions__block-item">' + buildAttractionCard(items[i], '') + '</div>';
+      i += 1;
+    }
+    if (i < items.length) {
+      splitRight += '<div class="attractions__block-item">' + buildAttractionCard(items[i], '') + '</div>';
+      i += 1;
+    }
+    html +=
+      '<div class="attractions__block attractions__block--split">' +
+      '<div class="attractions__block-split-left">' + splitLeft + '</div>' +
+      '<div class="attractions__block-split-right">' + splitRight + '</div>' +
+      '</div>';
+  }
   return html;
 }
 
 function initAttractions() {
-  const items = getAttractionsFromDom();
-  if (items.length === 0) return;
+  // Читаем два отдельных массива из DOM
+  const topItems = getAttractionsFromDom('attractionsDataTop');
+  const bottomItems = getAttractionsFromDom('attractionsDataBottom');
+  
+  if (topItems.length === 0 && bottomItems.length === 0) return;
 
   const section = document.getElementById('attractions');
-  const visibleCount =
-    parseInt(section.getAttribute('data-attractions-visible'), 10) || ATTRACTIONS_VISIBLE_DEFAULT;
-
   const topWrapper = document.querySelector('.attraction-swiper-top .swiper-wrapper');
   const bottomWrapper = document.querySelector('.attraction-swiper-bottom .swiper-wrapper');
   const mobileGrid = document.querySelector('.attractions__grid--mobile');
   const moreBtn = document.getElementById('attractionsMoreBtn');
 
-  if (topWrapper) topWrapper.innerHTML = buildAttractionsDesktopTop(items);
-  if (bottomWrapper) bottomWrapper.innerHTML = buildAttractionsDesktopBottom(items);
-  if (mobileGrid) mobileGrid.innerHTML = buildAttractionsMobileItems(items, visibleCount);
+  // Десктоп: верхний и нижний слайдеры — дублируем слайды 3× для бесконечной плавной ленты
+  const REPEAT_SLIDES = 3;
+  if (topWrapper && topItems.length > 0) {
+    const topHtml = buildAttractionsDesktopTop(topItems);
+    topWrapper.innerHTML = topHtml.repeat(REPEAT_SLIDES);
+  }
+  if (bottomWrapper && bottomItems.length > 0) {
+    const bottomHtml = buildAttractionsDesktopBottom(bottomItems);
+    bottomWrapper.innerHTML = bottomHtml.repeat(REPEAT_SLIDES);
+  }
+
+  // Мобилка: объединяем оба массива, паттерн блоков: два 50/50 → одна на всю ширину → одна слева + две справа в столбец
+  const mergedItems = mergeAttractionsWithDeduplication(topItems, bottomItems);
+  if (mobileGrid) {
+    mobileGrid.innerHTML = buildAttractionsMobileItems(mergedItems);
+    const blocks = mobileGrid.querySelectorAll('.attractions__block');
+    const initialVisible = 3; // первый цикл: pair + full + split
+    blocks.forEach((block, idx) => {
+      if (idx >= initialVisible) block.classList.add('attractions__block--hidden');
+    });
+  }
 
   const moreWrapper = document.querySelector('.attractions__more-wrapper');
-  if (moreWrapper && items.length <= visibleCount) {
-    moreWrapper.style.display = 'none';
+  if (moreWrapper && mobileGrid) {
+    const blocks = mobileGrid.querySelectorAll('.attractions__block');
+    if (blocks.length <= 3) moreWrapper.style.display = 'none';
   }
 
   if (moreBtn && mobileGrid) {
@@ -861,9 +930,8 @@ function initAttractions() {
       e.stopPropagation();
       if (window.innerWidth <= 768) {
         mobileGrid.classList.add('show-more');
-        const hiddenItems = mobileGrid.querySelectorAll('.attractions__grid-item--hidden');
-        hiddenItems.forEach((item) => {
-          item.style.display = 'flex';
+        mobileGrid.querySelectorAll('.attractions__block--hidden').forEach((el) => {
+          el.classList.remove('attractions__block--hidden');
         });
         this.style.display = 'none';
       }
@@ -876,40 +944,40 @@ function initAttractions() {
 function initAttractionSliders() {
   if (typeof Swiper === 'undefined' || window.innerWidth <= 768) return;
 
-  // Инициализация attraction-swiper-top
+  const Autoplay = window.SwiperModules?.Autoplay;
+  if (!Autoplay) return;
+
+  const ATTRACTIONS_SLIDER_SPEED = 12000;
+
+  const commonAttractionOptions = {
+    modules: [Autoplay],
+    slidesPerView: 'auto',
+    spaceBetween: 20,
+    loop: true,
+    loopAdditionalSlides: 6,
+    speed: ATTRACTIONS_SLIDER_SPEED,
+    autoplay: {
+      delay: 0,
+      disableOnInteraction: false,
+    },
+    freeMode: false,
+    allowTouchMove: false,
+  };
+
   const attractionSwiperTop = document.querySelector('.attraction-swiper-top');
   if (attractionSwiperTop) {
-    new Swiper(attractionSwiperTop, {
-      modules: [window.SwiperModules.Autoplay],
-      slidesPerView: 'auto',
-      spaceBetween: 20,
-      loop: true,
-      speed: 15000,
-      autoplay: {
-        delay: 0,
-        disableOnInteraction: false,
-      },
-      freeMode: false,
-      allowTouchMove: false,
-    });
+    new Swiper(attractionSwiperTop, { ...commonAttractionOptions });
   }
 
-  // Инициализация attraction-swiper-bottom
   const attractionSwiperBottom = document.querySelector('.attraction-swiper-bottom');
   if (attractionSwiperBottom) {
     new Swiper(attractionSwiperBottom, {
-      modules: [window.SwiperModules.Autoplay],
-      slidesPerView: 'auto',
-      spaceBetween: 20,
-      loop: true,
-      speed: 15000,
+      ...commonAttractionOptions,
       autoplay: {
         delay: 0,
         disableOnInteraction: false,
         reverseDirection: true,
       },
-      freeMode: false,
-      allowTouchMove: false,
     });
   }
 }
@@ -1361,6 +1429,7 @@ function initAdminDeleteModal() {
   const bookingsBody = document.querySelector('[data-admin-bookings-body]');
   const totalEl = document.querySelector('[data-admin-total]');
   let pendingRow = null;
+  let pendingBookingId = null;
 
   if (!modal) return;
 
@@ -1373,6 +1442,7 @@ function initAdminDeleteModal() {
     modal.classList.remove('modal--open');
     document.body.style.overflow = '';
     pendingRow = null;
+    pendingBookingId = null;
   };
 
   document.addEventListener('click', (event) => {
@@ -1380,6 +1450,7 @@ function initAdminDeleteModal() {
     if (!deleteBtn) return;
     event.preventDefault();
     pendingRow = deleteBtn.closest('.admin-table__row');
+    pendingBookingId = deleteBtn.dataset.bookingId;
     openModal();
   });
 
@@ -1393,16 +1464,40 @@ function initAdminDeleteModal() {
     cancelBtn.addEventListener('click', closeModal);
   }
   if (confirmBtn) {
-    confirmBtn.addEventListener('click', () => {
-      if (pendingRow) {
-        pendingRow.remove();
-        if (bookingsBody && bookingsBody.children.length === 0) {
-          bookingsBody.innerHTML = '<div class="admin-table__empty">Нет броней</div>';
-          if (totalEl) {
-            totalEl.textContent = '0';
-          }
-        }
+    confirmBtn.addEventListener('click', async () => {
+      if (!pendingBookingId) {
+        closeModal();
+        return;
       }
+
+      try {
+        const response = await fetch('local/components/kit/admin.booking/templates/ajax/remove_el.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: `id=${encodeURIComponent(pendingBookingId)}`
+        });
+
+        if (response.ok) {
+          if (pendingRow) {
+            pendingRow.remove();
+            if (bookingsBody && bookingsBody.children.length === 0) {
+              bookingsBody.innerHTML = '<div class="admin-table__empty">Нет броней</div>';
+              if (totalEl) {
+                totalEl.textContent = '0';
+              }
+            }
+          }
+        } else {
+          console.error('Error deleting booking:', response.statusText);
+          alert('Ошибка при удалении брони');
+        }
+      } catch (error) {
+        console.error('Error deleting booking:', error);
+        alert('Ошибка при удалении брони');
+      }
+
       closeModal();
     });
   }
@@ -2136,26 +2231,28 @@ function initAdminPanel() {
 
       // Поддержка разных форматов данных
       const guestName = booking.guest?.name || booking.guest || booking.name || '—';
-      const guestCity = booking.city || '—';
+      const guestPhone = booking.phone || '—';
       const guestsCount = booking.guests?.adults 
         ? `${booking.guests.adults + (booking.guests.children || 0)}`
         : booking.guests || booking.guestsCount || '—';
 
+      const bitrixPathTemplate = '/locals/templates/main';
+
       return `
         <div class="admin-table__row" data-booking-id="${booking.id || index + 1}">
           <span class="admin-table__id">
-            <img src="/img/svg/icon-change.svg" alt="" class="admin-table__edit-icon">
+            <img src="${bitrixPathTemplate}/img/svg/icon-change.svg" alt="" class="admin-table__edit-icon">
             ${booking.id || index + 1}
           </span>
           <span>${guestName}</span>
-          <span>${guestCity}</span>
+          <span><a href="tel:+${guestPhone}">+${guestPhone}</a></span>
           <span>${checkin ? formatShortDate(checkin) : '—'}</span>
           <span>${checkout ? formatShortDate(checkout) : '—'}</span>
           <span>${guestsCount}</span>
           <span>${formatNumber(totalPrice)}</span>
           <span>${booking.comment || '—'}</span>
           <button type="button" class="admin-table__delete" aria-label="Удалить" data-admin-delete data-booking-id="${booking.id || index + 1}">
-            <img src="/img/svg/icon-admin-delete.svg" alt="">
+            <img src="${bitrixPathTemplate}/img/svg/icon-admin-delete.svg" alt="">
           </button>
         </div>
       `;
@@ -2634,7 +2731,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initGallery();
   initAdvantages();
   initAttractions();
-  initAttractionSliders();
+  // initAttractionSliders();
   initAboutDropsParallax();
   initEntranceAnimations();
   initMobileMenu();

@@ -54,14 +54,17 @@
                         <img src="/img/svg/telegram.svg" alt="Telegram">
                     </a>
                     <a href="https://vk.com/milahouse" target="_blank" rel="noopener noreferrer" class="header__messenger-link">
-                        <img src="/img/svg/icon-max.svg" alt="VK">
+                        <img src="/img/svg/icon-max.svg" alt="MAX">
                     </a>
                     <a href="https://wa.me/79181329575" target="_blank" rel="noopener noreferrer" class="header__messenger-link">
                         <img src="/img/svg/icon-whatsapp.svg" alt="WhatsApp">
                     </a>
+                    <a href="https://vk.com/milahouse" target="_blank" rel="noopener noreferrer" class="header__messenger-link">
+                        <img src="/img/svg/vk.svg" alt="VK">
+                    </a>
                 </div>
             </div>
-            <button class="header__booking-btn" data-fancybox-dialog data-src="/dialogs/lead-modal.html">
+            <button class="header__booking-btn" data-fancybox-dialog data-src="/ajax/dialogs/lead-modal.php">
                 <img src="/img/svg/calendar-icon.svg" alt="Календарь">
                 <span>Выбрать номер</span>
             </button>
@@ -105,7 +108,7 @@
                     </a>
                 </div>
             </div>
-            <button class="header__nav-booking" data-fancybox-dialog data-src="/dialogs/lead-modal.html">
+            <button class="header__nav-booking" data-fancybox-dialog data-src="/ajax/dialogs/lead-modal.php">
                 <img src="/img/svg/calendar-icon.svg" alt="Календарь">
                 <span>Выбрать номер</span>
             </button>
@@ -129,9 +132,10 @@
                 <!-- 
                   Формат данных для бэкендера:
                   data-bookings - JSON массив всех бронирований
-                  Формат объекта: {"checkin":"YYYY-MM-DD","checkout":"YYYY-MM-DD","roomId":"N","guest":"Имя","city":"Город","guests":"3","price":"45000","comment":"Комментарий"}
+                  phone - строка, 11 цифр, начинается с 7 БЕЗ ПЛЮСА, например: 79991234567
+                  Формат объекта: {"checkin":"YYYY-MM-DD","checkout":"YYYY-MM-DD","roomId":"N","guest":"Имя","phone":"79991234567","guests":"3","price":"45000","comment":"Комментарий"}
                 -->
-                <form class="admin-form" id="adminBookingForm" autocomplete="off" data-bookings='[{"checkin":"2026-02-15","checkout":"2026-02-20","roomId":"1","guest":"Константин","city":"Новороссийск","guests":"3","price":"45000","comment":"Переписка в личном чате"}]'>
+                <form action="local/components/kit/admin.booking/templates/ajax/add_el.php" class="admin-form" id="adminBookingForm" autocomplete="off" data-bookings='[{"checkin":"2026-02-15","checkout":"2026-02-20","roomId":"1","guest":"Константин","phone":"+79991234567","guests":"3","price":"45000","comment":"Переписка в личном чате"}]'>
                     <div class="admin-form__grid">
                         <label class="admin-field admin-field--name">
                             <span class="admin-field__label">Ваше имя <span class="admin-field__required">*</span></span>
@@ -232,10 +236,11 @@
                 <!--
                   Табы номеров
                   data-room-bookings - JSON массив бронирований для конкретного номера
-                  Формат: [{"checkin":"YYYY-MM-DD","checkout":"YYYY-MM-DD","roomId":"N","id":"123","guest":"Имя","city":"Город","guests":"3","price":"45000","comment":"Комментарий"}]
+                  phone - строка, 11 цифр, начинается с 7 БЕЗ ПЛЮСА, например: 79991234567
+                  Формат: [{"checkin":"YYYY-MM-DD","checkout":"YYYY-MM-DD","roomId":"N","id":"123","guest":"Имя","phone":"79991234567","guests":"3","price":"45000","comment":"Комментарий"}]
                 -->
                 <div class="admin-tabs" data-admin-tabs>
-                    <button type="button" class="admin-tabs__btn admin-tabs__btn--active" data-admin-room-tab data-room-id="1" data-room-bookings='[{"id":"431","checkin":"2026-07-18","checkout":"2026-07-19","roomId":"1","guest":"Константин","city":"Новороссийск","guests":"3","price":"45000","comment":"Переписка в личном чате"}]'>Номер 1</button>
+                    <button type="button" class="admin-tabs__btn admin-tabs__btn--active" data-admin-room-tab data-room-id="1" data-room-bookings='[{"id":"431","checkin":"2026-07-18","checkout":"2026-07-19","roomId":"1","guest":"Константин","phone":"79991234567","guests":"3","price":"45000","comment":"Переписка в личном чате"}]'>Номер 1</button>
                     <button type="button" class="admin-tabs__btn" data-admin-room-tab data-room-id="2" data-room-bookings="[]">Номер 2</button>
                     <button type="button" class="admin-tabs__btn" data-admin-room-tab data-room-id="3" data-room-bookings="[]">Номер 3</button>
                     <button type="button" class="admin-tabs__btn" data-admin-room-tab data-room-id="4" data-room-bookings="[]">Номер 4</button>
@@ -256,7 +261,7 @@
                         <div class="admin-table__head">
                             <span>ID</span>
                             <span>Имя</span>
-                            <span>Город</span>
+                            <span>Номер телефона</span>
                             <span>Заезд</span>
                             <span>Выезд</span>
                             <span>Кол-во чел</span>
@@ -337,6 +342,9 @@
                         </a>
                         <a href="https://wa.me/79181329575" target="_blank" rel="noopener noreferrer" class="contacts__messenger-link">
                             <img src="/img/svg/icon-whatsapp.svg" alt="WhatsApp">
+                        </a>
+                        <a href="https://vk.com/milahouse" target="_blank" rel="noopener noreferrer" class="header__messenger-link">
+                            <img src="/img/svg/vk.svg" alt="VK">
                         </a>
                     </div>
                 </div>

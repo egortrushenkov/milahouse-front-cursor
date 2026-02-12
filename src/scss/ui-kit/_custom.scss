@@ -61,8 +61,8 @@
     
     > .f-button.is-close-btn {
       position: absolute;
-      top: 16px;
-      right: 16px;
+      top: 16px !important;
+      right: 16px !important;
       width: 32px;
       height: 32px;
       background: #FFFFFF;
@@ -819,3 +819,4 @@
     }
   }
 }
+
