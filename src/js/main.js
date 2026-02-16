@@ -2473,7 +2473,7 @@ function initAdminPanel() {
             ${booking.id || index + 1}
           </span>
           <span>${guestName}</span>
-          <span><a href="tel:+${guestPhone}">+${guestPhone}</a></span>
+          <span><a href="tel:${guestPhone}">${guestPhone}</a></span>
           <span>${checkin ? formatShortDate(checkin) : "—"}</span>
           <span>${checkout ? formatShortDate(checkout) : "—"}</span>
           <span>${guestsCount}</span>
