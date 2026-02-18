@@ -1,3 +1,23 @@
+// Import air-datepicker - ВАЖНО: импортируем ДО main.scss, чтобы кастомные стили перезаписывали оригинальные
+import 'air-datepicker/air-datepicker.css';
+import AirDatepicker from 'air-datepicker';
+
+// Import Swiper
+import Swiper from 'swiper';
+import { Navigation, Pagination, Scrollbar, Autoplay, Grid, Thumbs, FreeMode } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+
+// Import Fancybox
+import { Fancybox } from '@fancyapps/ui';
+import '@fancyapps/ui/dist/fancybox/fancybox.css';
+
+window.AirDatepicker = AirDatepicker;
+window.Swiper = Swiper;
+window.Fancybox = Fancybox;
+window.SwiperModules = { Navigation, Pagination, Scrollbar, Autoplay, Grid, Thumbs, FreeMode };
+
 const media = {
   xs: 459.98,
   sm: 575.98,
@@ -2547,369 +2567,367 @@ function initPreloader() {
   }
 }
 
-// Initialize Fancybox (v5 like hodlerexchange)
-if (typeof Fancybox !== "undefined") {
-  // Fancybox v5 has defaults
-  Fancybox.defaults.mainClass = "fancybox-custom";
-  Fancybox.defaults.trapFocus = false;
-  Fancybox.defaults.autoFocus = false;
-  Fancybox.defaults.placeFocusBack = false;
 
-  // Очищаем календарь при закрытии модалки и инициализируем маску телефона при открытии
-  Fancybox.defaults.on = {
-    close: () => {
+// Fancybox v5 has defaults
+Fancybox.defaults.mainClass = "fancybox-custom";
+Fancybox.defaults.trapFocus = false;
+Fancybox.defaults.autoFocus = false;
+Fancybox.defaults.placeFocusBack = false;
+
+// Очищаем календарь при закрытии модалки и инициализируем маску телефона при открытии
+Fancybox.defaults.on = {
+  close: () => {
+    if (window.roomModalFancyboxDatePicker) {
+      try {
+        window.roomModalFancyboxDatePicker.destroy();
+      } catch (e) {
+        console.warn("Error destroying datepicker on close:", e);
+      }
+      window.roomModalFancyboxDatePicker = null;
+    }
+  },
+  reveal: () => {
+    // Инициализируем маску телефона при открытии любого модального окна
+    setTimeout(() => {
+      const content = document.querySelector(".fancybox__content");
+      if (content) {
+        const phoneInputs = content.querySelectorAll('input[type="tel"]');
+        phoneInputs.forEach((input) => {
+          delete input.dataset.phoneMaskInitialized;
+          applyPhoneMask(input);
+        });
+        // Дополнительно ищем поле bookingPhone
+        const bookingPhone = document.getElementById("bookingPhone");
+        if (bookingPhone && !bookingPhone.dataset.phoneMaskInitialized) {
+          delete bookingPhone.dataset.phoneMaskInitialized;
+          applyPhoneMask(bookingPhone);
+        }
+      }
+    }, 100);
+  },
+};
+
+
+// Глобальное делегирование для счетчиков в модалках (работает для всех модалок)
+if (!window.modalCountersGlobalHandlerInitialized) {
+  window.modalCountersGlobalHandlerInitialized = true;
+  document.addEventListener("click", (e) => {
+    const target = e.target;
+    // Проверяем, что клик был внутри модалки
+    const modalContent = target.closest(
+      ".fancybox__content, .modal__content",
+    );
+    if (!modalContent) return;
+
+    if (
+      target.matches(
+        "[data-counter-minus], .modal__counter-btn--minus, [data-counter-plus], .modal__counter-btn--plus",
+      )
+    ) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const wrapper =
+        target.closest(".modal__form-counter-group") ||
+        target.closest(".room-modal__counter-group") ||
+        target.closest(".modal__counter");
+      if (!wrapper) return;
+
+      const valueEl = wrapper.querySelector(
+        "[data-counter-value], .modal__counter-value",
+      );
+      if (!valueEl) return;
+
+      // Все счетчики имеют максимум 15
+      const maxValue = 15;
+      const minValue = 0;
+      let value = parseInt(valueEl.value) || 0;
+
+      if (
+        target.matches("[data-counter-minus], .modal__counter-btn--minus")
+      ) {
+        if (value > minValue) {
+          value--;
+          valueEl.value = value;
+        }
+      } else if (
+        target.matches("[data-counter-plus], .modal__counter-btn--plus")
+      ) {
+        if (value < maxValue) {
+          value++;
+          valueEl.value = value;
+        }
+      }
+    }
+  });
+}
+
+// Helper function to initialize modal content
+function initModalContent() {
+  const content = document.querySelector(".fancybox__content");
+  if (!content) return;
+
+  // Re-initialize phone mask in modal
+  // Используем setTimeout для гарантии, что контент полностью загружен
+  setTimeout(() => {
+    // Ищем все поля телефона в модальном окне
+    const phoneInputs = content.querySelectorAll('input[type="tel"]');
+    phoneInputs.forEach((input) => {
+      // Сбрасываем флаг инициализации, если элемент был пересоздан
+      delete input.dataset.phoneMaskInitialized;
+      applyPhoneMask(input);
+    });
+
+    // Дополнительно ищем поле bookingPhone по ID (для модального окна "забронировать номер")
+    const bookingPhone = document.getElementById("bookingPhone");
+    if (bookingPhone && !bookingPhone.dataset.phoneMaskInitialized) {
+      delete bookingPhone.dataset.phoneMaskInitialized;
+      applyPhoneMask(bookingPhone);
+    }
+  }, 150);
+
+  // Счетчики в модалках обрабатываются глобальным делегированием на document (см. выше)
+
+  // Initialize Swiper for room modal slider
+  const roomModalSlider = content.querySelector(".room-modal__slider");
+  if (roomModalSlider && typeof Swiper !== "undefined") {
+    try {
+      const { Navigation, Pagination } = window.SwiperModules || {};
+      new Swiper(roomModalSlider, {
+        modules: [Navigation, Pagination],
+        slidesPerView: 1,
+        spaceBetween: 0,
+        loop: true,
+        navigation: {
+          nextEl: content.querySelector(".room-modal__slider-btn--next"),
+          prevEl: content.querySelector(".room-modal__slider-btn--prev"),
+        },
+        pagination: {
+          el: content.querySelector(".room-modal__slider-pagination"),
+          clickable: true,
+          type: "bullets",
+        },
+      });
+    } catch (err) {
+      console.error("Error initializing room modal slider:", err);
+    }
+  }
+
+  // Store selected dates for booking
+  let selectedCheckin = null;
+  let selectedCheckout = null;
+
+  // Initialize AirDatepicker for room modal calendar
+  // Удаляем старый календарь, если он существует
+  const calendarContainer = content.querySelector(
+    ".room-modal__calendar-container",
+  );
+  if (calendarContainer && typeof AirDatepicker !== "undefined") {
+    try {
+      // Удаляем все дочерние элементы (старый календарь)
+      calendarContainer.innerHTML = "";
+
+      // Проверяем, есть ли уже datepicker в этом контейнере и удаляем его
       if (window.roomModalFancyboxDatePicker) {
         try {
           window.roomModalFancyboxDatePicker.destroy();
         } catch (e) {
-          console.warn("Error destroying datepicker on close:", e);
+          console.warn("Error destroying old datepicker:", e);
         }
         window.roomModalFancyboxDatePicker = null;
       }
-    },
-    reveal: () => {
-      // Инициализируем маску телефона при открытии любого модального окна
-      setTimeout(() => {
-        const content = document.querySelector(".fancybox__content");
-        if (content) {
-          const phoneInputs = content.querySelectorAll('input[type="tel"]');
-          phoneInputs.forEach((input) => {
-            delete input.dataset.phoneMaskInitialized;
-            applyPhoneMask(input);
-          });
-          // Дополнительно ищем поле bookingPhone
-          const bookingPhone = document.getElementById("bookingPhone");
-          if (bookingPhone && !bookingPhone.dataset.phoneMaskInitialized) {
-            delete bookingPhone.dataset.phoneMaskInitialized;
-            applyPhoneMask(bookingPhone);
-          }
-        }
-      }, 100);
-    },
-  };
-  window.Fancybox = Fancybox;
 
-  // Глобальное делегирование для счетчиков в модалках (работает для всех модалок)
-  if (!window.modalCountersGlobalHandlerInitialized) {
-    window.modalCountersGlobalHandlerInitialized = true;
-    document.addEventListener("click", (e) => {
-      const target = e.target;
-      // Проверяем, что клик был внутри модалки
-      const modalContent = target.closest(
-        ".fancybox__content, .modal__content",
-      );
-      if (!modalContent) return;
-
-      if (
-        target.matches(
-          "[data-counter-minus], .modal__counter-btn--minus, [data-counter-plus], .modal__counter-btn--plus",
-        )
-      ) {
-        e.preventDefault();
-        e.stopPropagation();
-
-        const wrapper =
-          target.closest(".modal__form-counter-group") ||
-          target.closest(".room-modal__counter-group") ||
-          target.closest(".modal__counter");
-        if (!wrapper) return;
-
-        const valueEl = wrapper.querySelector(
-          "[data-counter-value], .modal__counter-value",
-        );
-        if (!valueEl) return;
-
-        // Все счетчики имеют максимум 15
-        const maxValue = 15;
-        const minValue = 0;
-        let value = parseInt(valueEl.value) || 0;
-
-        if (
-          target.matches("[data-counter-minus], .modal__counter-btn--minus")
-        ) {
-          if (value > minValue) {
-            value--;
-            valueEl.value = value;
-          }
-        } else if (
-          target.matches("[data-counter-plus], .modal__counter-btn--plus")
-        ) {
-          if (value < maxValue) {
-            value++;
-            valueEl.value = value;
-          }
+      // Get bookings from data attribute
+      const bookingsData = calendarContainer.dataset.roomBookings;
+      let bookings = [];
+      if (bookingsData) {
+        try {
+          bookings = JSON.parse(bookingsData);
+        } catch (e) {
+          bookings = [];
         }
       }
+
+      window.roomModalFancyboxDatePicker = new AirDatepicker(
+        calendarContainer,
+        {
+          inline: true,
+          range: true,
+          multipleDates: false,
+          minDate: new Date(),
+          buttons: [],
+          locale: {
+            days: [
+              "Воскресенье",
+              "Понедельник",
+              "Вторник",
+              "Среда",
+              "Четверг",
+              "Пятница",
+              "Суббота",
+            ],
+            daysShort: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
+            daysMin: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
+            months: [
+              "Январь",
+              "Февраль",
+              "Март",
+              "Апрель",
+              "Май",
+              "Июнь",
+              "Июль",
+              "Август",
+              "Сентябрь",
+              "Октябрь",
+              "Ноябрь",
+              "Декабрь",
+            ],
+            monthsShort: [
+              "Янв",
+              "Фев",
+              "Мар",
+              "Апр",
+              "Май",
+              "Июн",
+              "Июл",
+              "Авг",
+              "Сен",
+              "Окт",
+              "Ноя",
+              "Дек",
+            ],
+            today: "Сегодня",
+            clear: "Очистить",
+            dateFormat: "dd.MM.yyyy",
+            timeFormat: "HH:mm",
+            firstDay: 1,
+          },
+          onSelect: ({ date, formattedDate }) => {
+            // Save selected dates
+            if (Array.isArray(date) && date.length === 2) {
+              selectedCheckin = formattedDate[0];
+              selectedCheckout = formattedDate[1];
+            } else if (date) {
+              selectedCheckin = formattedDate;
+              selectedCheckout = null;
+            }
+          },
+          onRenderCell: ({ date, cellType }) => {
+            if (cellType === "day") {
+              const dateStr = date.toISOString().split("T")[0];
+              const isBooked = bookings.some(
+                (booking) =>
+                  dateStr >= booking.checkin && dateStr < booking.checkout,
+              );
+              if (isBooked) {
+                return {
+                  disabled: true,
+                  classes: "room-modal__calendar-day--booked",
+                };
+              }
+            }
+          },
+        },
+      );
+    } catch (err) {
+      console.error("Error initializing room modal calendar:", err);
+      window.roomModalFancyboxDatePicker = null;
+    }
+  }
+
+  // Handle "Book" button click - close room modal and open booking modal
+  const bookBtn = content.querySelector("#roomModalBook");
+  if (bookBtn) {
+    // Удаляем старые обработчики перед добавлением нового
+    const newBookBtn = bookBtn.cloneNode(true);
+    bookBtn.parentNode.replaceChild(newBookBtn, bookBtn);
+
+    newBookBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      // Store selected dates in sessionStorage for booking modal
+      if (selectedCheckin) {
+        sessionStorage.setItem("bookingCheckin", selectedCheckin);
+      }
+      if (selectedCheckout) {
+        sessionStorage.setItem("bookingCheckout", selectedCheckout);
+      }
+
+      // Close current Fancybox and open booking modal
+      Fancybox.close();
+
+      // Open booking modal after a small delay
+      setTimeout(() => {
+        Fancybox.show(
+          [
+            {
+              src: "/ajax/dialogs/booking-modal.php",
+              type: "ajax",
+            },
+          ],
+          {
+            dragToClose: false,
+            mainClass: "fancybox-custom fancybox-modal",
+            on: {
+              done: () => {
+                // Используем небольшую задержку для гарантии загрузки контента
+                setTimeout(() => {
+                  initModalContent();
+                  // Fill in the dates from sessionStorage
+                  const checkinInput =
+                    document.querySelector("#bookingCheckin");
+                  const checkoutInput =
+                    document.querySelector("#bookingCheckout");
+                  const savedCheckin =
+                    sessionStorage.getItem("bookingCheckin");
+                  const savedCheckout =
+                    sessionStorage.getItem("bookingCheckout");
+                  if (checkinInput && savedCheckin) {
+                    checkinInput.value = savedCheckin;
+                  }
+                  if (checkoutInput && savedCheckout) {
+                    checkoutInput.value = savedCheckout;
+                  }
+                }, 100);
+              },
+              reveal: () => {
+                // Дополнительная инициализация при полном открытии модального окна
+                setTimeout(() => {
+                  initModalContent();
+                }, 50);
+              },
+            },
+          },
+        );
+      }, 100);
     });
   }
-
-  // Helper function to initialize modal content
-  function initModalContent() {
-    const content = document.querySelector(".fancybox__content");
-    if (!content) return;
-
-    // Re-initialize phone mask in modal
-    // Используем setTimeout для гарантии, что контент полностью загружен
-    setTimeout(() => {
-      // Ищем все поля телефона в модальном окне
-      const phoneInputs = content.querySelectorAll('input[type="tel"]');
-      phoneInputs.forEach((input) => {
-        // Сбрасываем флаг инициализации, если элемент был пересоздан
-        delete input.dataset.phoneMaskInitialized;
-        applyPhoneMask(input);
-      });
-
-      // Дополнительно ищем поле bookingPhone по ID (для модального окна "забронировать номер")
-      const bookingPhone = document.getElementById("bookingPhone");
-      if (bookingPhone && !bookingPhone.dataset.phoneMaskInitialized) {
-        delete bookingPhone.dataset.phoneMaskInitialized;
-        applyPhoneMask(bookingPhone);
-      }
-    }, 150);
-
-    // Счетчики в модалках обрабатываются глобальным делегированием на document (см. выше)
-
-    // Initialize Swiper for room modal slider
-    const roomModalSlider = content.querySelector(".room-modal__slider");
-    if (roomModalSlider && typeof Swiper !== "undefined") {
-      try {
-        const { Navigation, Pagination } = window.SwiperModules || {};
-        new Swiper(roomModalSlider, {
-          modules: [Navigation, Pagination],
-          slidesPerView: 1,
-          spaceBetween: 0,
-          loop: true,
-          navigation: {
-            nextEl: content.querySelector(".room-modal__slider-btn--next"),
-            prevEl: content.querySelector(".room-modal__slider-btn--prev"),
-          },
-          pagination: {
-            el: content.querySelector(".room-modal__slider-pagination"),
-            clickable: true,
-            type: "bullets",
-          },
-        });
-      } catch (err) {
-        console.error("Error initializing room modal slider:", err);
-      }
-    }
-
-    // Store selected dates for booking
-    let selectedCheckin = null;
-    let selectedCheckout = null;
-
-    // Initialize AirDatepicker for room modal calendar
-    // Удаляем старый календарь, если он существует
-    const calendarContainer = content.querySelector(
-      ".room-modal__calendar-container",
-    );
-    if (calendarContainer && typeof AirDatepicker !== "undefined") {
-      try {
-        // Удаляем все дочерние элементы (старый календарь)
-        calendarContainer.innerHTML = "";
-
-        // Проверяем, есть ли уже datepicker в этом контейнере и удаляем его
-        if (window.roomModalFancyboxDatePicker) {
-          try {
-            window.roomModalFancyboxDatePicker.destroy();
-          } catch (e) {
-            console.warn("Error destroying old datepicker:", e);
-          }
-          window.roomModalFancyboxDatePicker = null;
-        }
-
-        // Get bookings from data attribute
-        const bookingsData = calendarContainer.dataset.roomBookings;
-        let bookings = [];
-        if (bookingsData) {
-          try {
-            bookings = JSON.parse(bookingsData);
-          } catch (e) {
-            bookings = [];
-          }
-        }
-
-        window.roomModalFancyboxDatePicker = new AirDatepicker(
-          calendarContainer,
-          {
-            inline: true,
-            range: true,
-            multipleDates: false,
-            minDate: new Date(),
-            buttons: [],
-            locale: {
-              days: [
-                "Воскресенье",
-                "Понедельник",
-                "Вторник",
-                "Среда",
-                "Четверг",
-                "Пятница",
-                "Суббота",
-              ],
-              daysShort: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
-              daysMin: ["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"],
-              months: [
-                "Январь",
-                "Февраль",
-                "Март",
-                "Апрель",
-                "Май",
-                "Июнь",
-                "Июль",
-                "Август",
-                "Сентябрь",
-                "Октябрь",
-                "Ноябрь",
-                "Декабрь",
-              ],
-              monthsShort: [
-                "Янв",
-                "Фев",
-                "Мар",
-                "Апр",
-                "Май",
-                "Июн",
-                "Июл",
-                "Авг",
-                "Сен",
-                "Окт",
-                "Ноя",
-                "Дек",
-              ],
-              today: "Сегодня",
-              clear: "Очистить",
-              dateFormat: "dd.MM.yyyy",
-              timeFormat: "HH:mm",
-              firstDay: 1,
-            },
-            onSelect: ({ date, formattedDate }) => {
-              // Save selected dates
-              if (Array.isArray(date) && date.length === 2) {
-                selectedCheckin = formattedDate[0];
-                selectedCheckout = formattedDate[1];
-              } else if (date) {
-                selectedCheckin = formattedDate;
-                selectedCheckout = null;
-              }
-            },
-            onRenderCell: ({ date, cellType }) => {
-              if (cellType === "day") {
-                const dateStr = date.toISOString().split("T")[0];
-                const isBooked = bookings.some(
-                  (booking) =>
-                    dateStr >= booking.checkin && dateStr < booking.checkout,
-                );
-                if (isBooked) {
-                  return {
-                    disabled: true,
-                    classes: "room-modal__calendar-day--booked",
-                  };
-                }
-              }
-            },
-          },
-        );
-      } catch (err) {
-        console.error("Error initializing room modal calendar:", err);
-        window.roomModalFancyboxDatePicker = null;
-      }
-    }
-
-    // Handle "Book" button click - close room modal and open booking modal
-    const bookBtn = content.querySelector("#roomModalBook");
-    if (bookBtn) {
-      // Удаляем старые обработчики перед добавлением нового
-      const newBookBtn = bookBtn.cloneNode(true);
-      bookBtn.parentNode.replaceChild(newBookBtn, bookBtn);
-
-      newBookBtn.addEventListener("click", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-
-        // Store selected dates in sessionStorage for booking modal
-        if (selectedCheckin) {
-          sessionStorage.setItem("bookingCheckin", selectedCheckin);
-        }
-        if (selectedCheckout) {
-          sessionStorage.setItem("bookingCheckout", selectedCheckout);
-        }
-
-        // Close current Fancybox and open booking modal
-        Fancybox.close();
-
-        // Open booking modal after a small delay
-        setTimeout(() => {
-          Fancybox.show(
-            [
-              {
-                src: "/ajax/dialogs/booking-modal.php",
-                type: "ajax",
-              },
-            ],
-            {
-              dragToClose: false,
-              mainClass: "fancybox-custom fancybox-modal",
-              on: {
-                done: () => {
-                  // Используем небольшую задержку для гарантии загрузки контента
-                  setTimeout(() => {
-                    initModalContent();
-                    // Fill in the dates from sessionStorage
-                    const checkinInput =
-                      document.querySelector("#bookingCheckin");
-                    const checkoutInput =
-                      document.querySelector("#bookingCheckout");
-                    const savedCheckin =
-                      sessionStorage.getItem("bookingCheckin");
-                    const savedCheckout =
-                      sessionStorage.getItem("bookingCheckout");
-                    if (checkinInput && savedCheckin) {
-                      checkinInput.value = savedCheckin;
-                    }
-                    if (checkoutInput && savedCheckout) {
-                      checkoutInput.value = savedCheckout;
-                    }
-                  }, 100);
-                },
-                reveal: () => {
-                  // Дополнительная инициализация при полном открытии модального окна
-                  setTimeout(() => {
-                    initModalContent();
-                  }, 50);
-                },
-              },
-            },
-          );
-        }, 100);
-      });
-    }
-  }
-
-  // Bind Fancybox for galleries
-  Fancybox.bind("[data-fancybox]");
-
-  // Bind Fancybox for dialogs with AJAX loading (like hodlerexchange)
-  Fancybox.bind("[data-fancybox-dialog]", {
-    dragToClose: false,
-    defaultType: "ajax",
-    closeClick: "outside", // Close when clicking outside the modal content
-    on: {
-      done: () => {
-        // Используем небольшую задержку для гарантии загрузки контента
-        setTimeout(() => {
-          initModalContent();
-        }, 100);
-      },
-      reveal: () => {
-        // Дополнительная инициализация при полном открытии модального окна
-        setTimeout(() => {
-          initModalContent();
-        }, 50);
-      },
-    },
-  });
 }
+
+// Bind Fancybox for galleries
+Fancybox.bind("[data-fancybox]");
+
+// Bind Fancybox for dialogs with AJAX loading (like hodlerexchange)
+Fancybox.bind("[data-fancybox-dialog]", {
+  dragToClose: false,
+  defaultType: "ajax",
+  closeClick: "outside", // Close when clicking outside the modal content
+  on: {
+    done: () => {
+      // Используем небольшую задержку для гарантии загрузки контента
+      setTimeout(() => {
+        initModalContent();
+      }, 100);
+    },
+    reveal: () => {
+      // Дополнительная инициализация при полном открытии модального окна
+      setTimeout(() => {
+        initModalContent();
+      }, 50);
+    },
+  },
+});
 
 // Initialize Swiper sliders
 function initSliders() {
