@@ -2130,7 +2130,10 @@ function initCookieBanner() {
 
 function scrollToHero() {
   const hero = document.getElementById("hero");
-  if (!hero) return;
+  if (!hero) {
+    window.location.href = "/#hero";
+    return;
+  }
   hero.scrollIntoView({ behavior: "smooth", block: "start" });
   const checkinInput = document.getElementById("checkin-input");
   if (checkinInput) {
@@ -2139,13 +2142,15 @@ function scrollToHero() {
 }
 
 function initHeaderBookingScroll() {
-  const bookingBtn = document.querySelector(".header__booking-btn");
-  if (bookingBtn) {
-    bookingBtn.addEventListener("click", (e) => {
+  const buttons = document.querySelectorAll(".header__booking-btn, .header__nav-booking");
+  buttons.forEach(btn => {
+    btn.addEventListener("click", (e) => {
       e.preventDefault();
+      // Если на кнопке висит Fancybox, предотвращаем его открытие, так как мы хотим скроллить к херо
+      e.stopPropagation();
       scrollToHero();
     });
-  }
+  });
 }
 
 function initHeaderNavFixed() {
