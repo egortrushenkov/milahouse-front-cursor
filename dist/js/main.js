@@ -11029,7 +11029,7 @@ if (!window.isFormsBound) {
 
             if (result.status === true) {
               Oe.show([{
-                src: "/dialogs/success-modal.html",
+                src: "ajax/dialogs/success-modal.php",
                 type: "ajax"
               }], {
                 dragToClose: false,
@@ -11039,7 +11039,7 @@ if (!window.isFormsBound) {
             } else {
               // Если есть ошибка от сервера (опционально можно куда-то вывести result.error)
               Oe.show([{
-                src: "/dialogs/error-modal.html",
+                src: "ajax/dialogs/error-modal.php",
                 type: "ajax"
               }], {
                 dragToClose: false,
@@ -11055,7 +11055,7 @@ if (!window.isFormsBound) {
             console.error("Form submit error:", _t2);
             Oe.close();
             Oe.show([{
-              src: "/dialogs/error-modal.html",
+              src: "ajax/dialogs/error-modal.php",
               type: "ajax"
             }], {
               dragToClose: false,
@@ -12402,7 +12402,7 @@ function initModalContent() {
       // Open booking modal after a small delay
       setTimeout(function () {
         Oe.show([{
-          src: "/dialogs/booking-modal.html",
+          src: "ajax/dialogs/booking-modal.php",
           type: "ajax"
         }], {
           dragToClose: false,
@@ -12450,7 +12450,7 @@ if (!window.isConsentBound) {
     e.preventDefault();
     e.stopPropagation();
     Oe.show([{
-      src: "/dialogs/consent-modal.html",
+      src: "ajax/dialogs/consent-modal.php",
       type: "ajax"
     }], {
       dragToClose: false,

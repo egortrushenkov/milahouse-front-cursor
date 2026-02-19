@@ -1309,14 +1309,14 @@ if (!window.isFormsBound) {
         Fancybox.close(); // Закрываем текущую форму
         
         if (result.status === true) {
-          Fancybox.show([{ src: "/dialogs/success-modal.html", type: "ajax" }], {
+          Fancybox.show([{ src: "ajax/dialogs/success-modal.php", type: "ajax" }], {
             dragToClose: false,
             mainClass: "fancybox-custom fancybox-modal",
             closeClick: "outside"
           });
         } else {
           // Если есть ошибка от сервера (опционально можно куда-то вывести result.error)
-          Fancybox.show([{ src: "/dialogs/error-modal.html", type: "ajax" }], {
+          Fancybox.show([{ src: "ajax/dialogs/error-modal.php", type: "ajax" }], {
             dragToClose: false,
             mainClass: "fancybox-custom fancybox-modal",
             closeClick: "outside"
@@ -1326,7 +1326,7 @@ if (!window.isFormsBound) {
       } catch (error) {
         console.error("Form submit error:", error);
         Fancybox.close();
-        Fancybox.show([{ src: "/dialogs/error-modal.html", type: "ajax" }], {
+        Fancybox.show([{ src: "ajax/dialogs/error-modal.php", type: "ajax" }], {
           dragToClose: false,
           mainClass: "fancybox-custom fancybox-modal",
           closeClick: "outside"
@@ -2929,7 +2929,7 @@ function initModalContent() {
         Fancybox.show(
           [
             {
-              src: "/dialogs/booking-modal.html",
+              src: "ajax/dialogs/booking-modal.php",
               type: "ajax",
             },
           ],
@@ -2985,7 +2985,7 @@ if (!window.isConsentBound) {
     e.stopPropagation();
     
     Fancybox.show(
-      [{ src: "/dialogs/consent-modal.html", type: "ajax" }],
+      [{ src: "ajax/dialogs/consent-modal.php", type: "ajax" }],
       {
         dragToClose: false,
         mainClass: "fancybox-custom fancybox-modal",
