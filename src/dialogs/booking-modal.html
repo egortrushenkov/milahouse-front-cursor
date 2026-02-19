@@ -1,7 +1,7 @@
 <div class="modal__content">
     <!-- Кнопка закрытия предоставляется Fancybox -->
     <h2 class="modal__title">ЗАБРОНИРОВАТЬ НОМЕР</h2>
-    <form class="modal__form" id="bookingForm" action="/ajax/php/submit-handler.php" method="post">
+    <form class="modal__form" id="bookingForm" action="/php/submit-handler.html" method="post">
         <div class="modal__form-group">
             <label for="bookingName" class="modal__label">Ваше имя</label>
             <div class="modal__input-wrapper">
@@ -37,7 +37,7 @@
                 <label class="modal__label">Взрослые</label>
                 <div class="modal__counter">
                     <button type="button" class="modal__counter-btn modal__counter-btn--minus" data-counter-minus>-</button>
-                    <input type="number" class="modal__counter-value" data-counter-value value="2" min="0" max="15" step="1">
+                    <input type="number" class="modal__counter-value" name="adults" data-counter-value value="2" min="0" max="15" step="1">
                     <button type="button" class="modal__counter-btn modal__counter-btn--plus" data-counter-plus>+</button>
                 </div>
             </div>
@@ -45,10 +45,15 @@
                 <label class="modal__label">Дети до 7 лет</label>
                 <div class="modal__counter">
                     <button type="button" class="modal__counter-btn modal__counter-btn--minus" data-counter-minus>-</button>
-                    <input type="number" class="modal__counter-value" data-counter-value value="0" min="0" max="15" step="1">
+                    <input type="number" class="modal__counter-value" name="children" data-counter-value value="0" min="0" max="15" step="1">
                     <button type="button" class="modal__counter-btn modal__counter-btn--plus" data-counter-plus>+</button>
                 </div>
             </div>
+        </div>
+        <!-- Скрытые поля -->
+        <div class="modal__form-hidden">
+            <!-- ID Room -->
+            <input type="hidden" id="roomId" name="roomId" class="modal__input-hidden" value="">
         </div>
         <div class="modal__form-actions">
             <button type="submit" class="modal__submit">Отправить заявку</button>

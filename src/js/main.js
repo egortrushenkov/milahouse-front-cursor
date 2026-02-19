@@ -1272,11 +1272,73 @@ let selectedRoomData = null;
 let openPriceModalFromRoom = null;
 let openStatusModal = null;
 
-/**
- * Обработчик валидации формы бронирования
- * Форма отправляется стандартным способом через HTML form submit
- * @param {Event} e - Событие submit формы
- */
+// Глобальный перехватчик отправки форм
+if (!window.isFormsBound) {
+  window.isFormsBound = true;
+  document.addEventListener("submit", async (e) => {
+    const form = e.target;
+    
+    // Проверяем, что это форма из модалки лида или бронирования
+    if (form.matches("#leadForm, #bookingForm, .modal__form")) {
+      e.preventDefault();
+      
+      // Валидация средствами браузера
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+      
+      const submitBtn = form.querySelector('[type="submit"]');
+      if (submitBtn) submitBtn.disabled = true;
+      
+      try {
+        const formData = new FormData(form);
+        const response = await fetch("/ajax/php/submit-handler.php", {
+          method: "POST",
+          body: formData
+        });
+        
+        let result = {};
+        try {
+          result = await response.json();
+        } catch(err) {
+          // Fallback если сервер вернул не JSON
+          result = { status: response.ok };
+        }
+        
+        Fancybox.close(); // Закрываем текущую форму
+        
+        if (result.status === true) {
+          Fancybox.show([{ src: "/dialogs/success-modal.html", type: "ajax" }], {
+            dragToClose: false,
+            mainClass: "fancybox-custom fancybox-modal",
+            closeClick: "outside"
+          });
+        } else {
+          // Если есть ошибка от сервера (опционально можно куда-то вывести result.error)
+          Fancybox.show([{ src: "/dialogs/error-modal.html", type: "ajax" }], {
+            dragToClose: false,
+            mainClass: "fancybox-custom fancybox-modal",
+            closeClick: "outside"
+          });
+        }
+        
+      } catch (error) {
+        console.error("Form submit error:", error);
+        Fancybox.close();
+        Fancybox.show([{ src: "/dialogs/error-modal.html", type: "ajax" }], {
+          dragToClose: false,
+          mainClass: "fancybox-custom fancybox-modal",
+          closeClick: "outside"
+        });
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+        form.reset();
+      }
+    }
+  });
+}
+
 function handleBookingSubmit(e) {
   const form = e.target;
   if (form && !form.checkValidity()) {
@@ -1636,7 +1698,7 @@ function initAdminDeleteModal() {
 
       try {
         const response = await fetch(
-          "/local/components/kit/admin.booking/templates/ajax/remove_el.php",
+          "/local/components/kit/admin.booking/templates/remove_el.php",
           {
             method: "POST",
             headers: {
@@ -2633,29 +2695,29 @@ if (!window.modalCountersGlobalHandlerInitialized) {
         target.closest(".modal__counter");
       if (!wrapper) return;
 
-      const valueEl = wrapper.querySelector(
+      const valueEls = wrapper.querySelectorAll(
         "[data-counter-value], .modal__counter-value",
       );
-      if (!valueEl) return;
+      if (!valueEls || valueEls.length === 0) return;
 
       // Все счетчики имеют максимум 15
       const maxValue = 15;
       const minValue = 0;
-      let value = parseInt(valueEl.value) || 0;
+      let value = parseInt(valueEls[0].value) || 0;
 
       if (
         target.matches("[data-counter-minus], .modal__counter-btn--minus")
       ) {
         if (value > minValue) {
           value--;
-          valueEl.value = value;
+          valueEls.forEach(el => el.value = value);
         }
       } else if (
         target.matches("[data-counter-plus], .modal__counter-btn--plus")
       ) {
         if (value < maxValue) {
           value++;
-          valueEl.value = value;
+          valueEls.forEach(el => el.value = value);
         }
       }
     }
@@ -2862,7 +2924,7 @@ function initModalContent() {
         Fancybox.show(
           [
             {
-              src: "/ajax/dialogs/booking-modal.php",
+              src: "/dialogs/booking-modal.html",
               type: "ajax",
             },
           ],
@@ -2907,6 +2969,26 @@ function initModalContent() {
 
 // Bind Fancybox for galleries
 Fancybox.bind("[data-fancybox]");
+
+// Глобальный обработчик для кнопок [data-consent-open] (защита от двойного навешивания)
+if (!window.isConsentBound) {
+  window.isConsentBound = true;
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-consent-open]");
+    if (!btn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    
+    Fancybox.show(
+      [{ src: "/dialogs/consent-modal.html", type: "ajax" }],
+      {
+        dragToClose: false,
+        mainClass: "fancybox-custom fancybox-modal",
+        closeClick: "outside"
+      }
+    );
+  });
+}
 
 // Bind Fancybox for dialogs with AJAX loading (like hodlerexchange)
 Fancybox.bind("[data-fancybox-dialog]", {

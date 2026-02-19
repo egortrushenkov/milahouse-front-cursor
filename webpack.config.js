@@ -152,6 +152,9 @@ module.exports = {
       ]
     })
   ],
+  optimization: {
+    minimize: false, // Отключаем минификацию (сжатие в одну строку)
+  },
   devServer: {
     static: [
       {
