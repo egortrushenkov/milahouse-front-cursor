@@ -2995,6 +2995,108 @@ if (!window.isConsentBound) {
   });
 }
 
+/**
+ * Инициализирует обработчики для передачи данных форм через URL параметры
+ */
+function initFormDataHandlers() {
+  // ========================================
+  // ОБРАБОТКА HERO ФОРМЫ
+  // ========================================
+  const heroForm = document.querySelector(".hero__form");
+  if (heroForm) {
+    const submitBtn = heroForm.querySelector(".hero__form-submit");
+    if (submitBtn) {
+      submitBtn.addEventListener("click", (e) => {
+        // Не предотвращаем стандартное поведение - пусть Fancybox сам открывает диалог
+        // Просто обновляем data-src с параметрами
+        
+        // Собираем данные из формы
+        const checkinInput = heroForm.querySelector("#checkin-input");
+        const checkoutInput = heroForm.querySelector("#checkout-input");
+        const counterValues = heroForm.querySelectorAll("[data-counter-value]");
+        
+        const searchParams = new URLSearchParams();
+        
+        // Добавляем даты
+        if (checkinInput && checkinInput.value) {
+          searchParams.append("checkin", checkinInput.value);
+        }
+        if (checkoutInput && checkoutInput.value) {
+          searchParams.append("checkout", checkoutInput.value);
+        }
+        
+        // Добавляем количество людей
+        if (counterValues[0]) {
+          searchParams.append("adults", counterValues[0].value);
+        }
+        if (counterValues[1]) {
+          searchParams.append("children", counterValues[1].value);
+        }
+        
+        // Добавляем скрытые данные (bookings из hero формы)
+        const heroBookings = heroForm.dataset.bookings || "[]";
+        searchParams.append("bookings", heroBookings);
+        
+        // Обновляем data-src атрибут для открытия диалога с параметрами
+        const originalSrc = submitBtn.dataset.src || "ajax/dialogs/lead-modal.php";
+        const baseSrc = originalSrc.split("?")[0]; // Убираем старые параметры если есть
+        const queryString = searchParams.toString();
+        submitBtn.dataset.src = `${baseSrc}?${queryString}`;
+        //console.log("Updated hero form submit button data-src:", submitBtn.dataset.src);
+      });
+    }
+  }
+
+  // ========================================
+  // ОБРАБОТКА ROOM КАРТОЧЕК
+  // ========================================
+  const roomCards = document.querySelectorAll(".rooms__card");
+  roomCards.forEach((card) => {
+    card.addEventListener("click", (e) => {
+      // Не предотвращаем стандартное поведение - пусть Fancybox сам открывает диалог
+      
+      // Собираем данные комнаты
+      const roomId = card.dataset.roomId;
+      const capacity = card.dataset.roomCapacity;
+      const roomBookings = card.dataset.roomBookings || "[]";
+      
+      // Собираем данные из hero формы
+      const checkinInput = document.querySelector("#checkin-input");
+      const checkoutInput = document.querySelector("#checkout-input");
+      
+      const searchParams = new URLSearchParams();
+      
+      // Добавляем данные комнаты
+      searchParams.append("roomId", roomId);
+      searchParams.append("capacity", capacity);
+      searchParams.append("bookings", roomBookings);
+      
+      // Добавляем данные из hero формы если они заполнены
+      if (checkinInput && checkinInput.value) {
+        searchParams.append("checkin", checkinInput.value);
+      }
+      if (checkoutInput && checkoutInput.value) {
+        searchParams.append("checkout", checkoutInput.value);
+      }
+      
+      // Добавляем количество взрослых и детей из hero формы
+      const counterValues = document.querySelectorAll(".hero__form [data-counter-value]");
+      if (counterValues[0] && counterValues[0].value) {
+        searchParams.append("adults", counterValues[0].value);
+      }
+      if (counterValues[1] && counterValues[1].value) {
+        searchParams.append("children", counterValues[1].value);
+      }
+      
+      // Обновляем data-src атрибут для открытия диалога с параметрами
+      const originalSrc = card.dataset.src || "";
+      const baseSrc = originalSrc.split("?")[0]; // Убираем старые параметры если есть
+      const queryString = searchParams.toString();
+      card.dataset.src = `${baseSrc}?${queryString}`;
+    });
+  });
+}
+
 // Bind Fancybox for dialogs with AJAX loading (like hodlerexchange)
 Fancybox.bind("[data-fancybox-dialog]", {
   dragToClose: false,
@@ -3154,6 +3256,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initAdminPanel();
   initAdminDeleteModal();
   initPreloader();
+  initFormDataHandlers();
 
   const modalCheckinInput = document.getElementById("modalCheckin");
   const modalCheckoutInput = document.getElementById("modalCheckout");
