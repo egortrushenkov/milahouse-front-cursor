@@ -2913,30 +2913,36 @@ function initModalContent() {
       e.preventDefault();
       e.stopPropagation();
 
-      // Store selected dates in sessionStorage for booking modal
+      // Собираем параметры для передачи в booking-modal
+      const searchParams = new URLSearchParams();
+      
+      // Добавляем данные комнаты
+      if (window.selectedRoomData) {
+        searchParams.append("roomId", window.selectedRoomData.id || "");
+        searchParams.append("roomName", window.selectedRoomData.name || "");
+        searchParams.append("capacity", window.selectedRoomData.capacity || "");
+      }
+      
+      // Добавляем выбранные даты
       if (selectedCheckin) {
-        sessionStorage.setItem("bookingCheckin", selectedCheckin);
+        searchParams.append("checkin", selectedCheckin);
       }
       if (selectedCheckout) {
-        sessionStorage.setItem("bookingCheckout", selectedCheckout);
-      }
-
-      // Store room data in sessionStorage for booking modal
-      if (window.selectedRoomData) {
-        sessionStorage.setItem("bookingRoomId", window.selectedRoomData.id || "");
-        sessionStorage.setItem("bookingRoomName", window.selectedRoomData.name || "");
-        sessionStorage.setItem("bookingRoomCapacity", window.selectedRoomData.capacity || "");
+        searchParams.append("checkout", selectedCheckout);
       }
 
       // Close current Fancybox and open booking modal
       Fancybox.close();
 
       // Open booking modal after a small delay
+      const queryString = searchParams.toString();
+      const bookingUrl = queryString ? `ajax/dialogs/booking-modal.php?${queryString}` : "ajax/dialogs/booking-modal.php";
+      
       setTimeout(() => {
         Fancybox.show(
           [
             {
-              src: "ajax/dialogs/booking-modal.php",
+              src: bookingUrl,
               type: "ajax",
             },
           ],
@@ -2948,21 +2954,6 @@ function initModalContent() {
                 // Используем небольшую задержку для гарантии загрузки контента
                 setTimeout(() => {
                   initModalContent();
-                  // Fill in the dates from sessionStorage
-                  const checkinInput =
-                    document.querySelector("#bookingCheckin");
-                  const checkoutInput =
-                    document.querySelector("#bookingCheckout");
-                  const savedCheckin =
-                    sessionStorage.getItem("bookingCheckin");
-                  const savedCheckout =
-                    sessionStorage.getItem("bookingCheckout");
-                  if (checkinInput && savedCheckin) {
-                    checkinInput.value = savedCheckin;
-                  }
-                  if (checkoutInput && savedCheckout) {
-                    checkoutInput.value = savedCheckout;
-                  }
                 }, 100);
               },
               reveal: () => {

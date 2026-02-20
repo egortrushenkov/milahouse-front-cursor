@@ -12388,28 +12388,33 @@ function initModalContent() {
       e.preventDefault();
       e.stopPropagation();
 
-      // Store selected dates in sessionStorage for booking modal
-      if (selectedCheckin) {
-        sessionStorage.setItem("bookingCheckin", selectedCheckin);
-      }
-      if (selectedCheckout) {
-        sessionStorage.setItem("bookingCheckout", selectedCheckout);
+      // Собираем параметры для передачи в booking-modal
+      var searchParams = new URLSearchParams();
+
+      // Добавляем данные комнаты
+      if (window.selectedRoomData) {
+        searchParams.append("roomId", window.selectedRoomData.id || "");
+        searchParams.append("roomName", window.selectedRoomData.name || "");
+        searchParams.append("capacity", window.selectedRoomData.capacity || "");
       }
 
-      // Store room data in sessionStorage for booking modal
-      if (window.selectedRoomData) {
-        sessionStorage.setItem("bookingRoomId", window.selectedRoomData.id || "");
-        sessionStorage.setItem("bookingRoomName", window.selectedRoomData.name || "");
-        sessionStorage.setItem("bookingRoomCapacity", window.selectedRoomData.capacity || "");
+      // Добавляем выбранные даты
+      if (selectedCheckin) {
+        searchParams.append("checkin", selectedCheckin);
+      }
+      if (selectedCheckout) {
+        searchParams.append("checkout", selectedCheckout);
       }
 
       // Close current Fancybox and open booking modal
       Oe.close();
 
       // Open booking modal after a small delay
+      var queryString = searchParams.toString();
+      var bookingUrl = queryString ? "ajax/dialogs/booking-modal.php?".concat(queryString) : "ajax/dialogs/booking-modal.php";
       setTimeout(function () {
         Oe.show([{
-          src: "ajax/dialogs/booking-modal.php",
+          src: bookingUrl,
           type: "ajax"
         }], {
           dragToClose: false,
@@ -12419,17 +12424,6 @@ function initModalContent() {
               // Используем небольшую задержку для гарантии загрузки контента
               setTimeout(function () {
                 initModalContent();
-                // Fill in the dates from sessionStorage
-                var checkinInput = document.querySelector("#bookingCheckin");
-                var checkoutInput = document.querySelector("#bookingCheckout");
-                var savedCheckin = sessionStorage.getItem("bookingCheckin");
-                var savedCheckout = sessionStorage.getItem("bookingCheckout");
-                if (checkinInput && savedCheckin) {
-                  checkinInput.value = savedCheckin;
-                }
-                if (checkoutInput && savedCheckout) {
-                  checkoutInput.value = savedCheckout;
-                }
               }, 100);
             },
             reveal: function reveal() {
