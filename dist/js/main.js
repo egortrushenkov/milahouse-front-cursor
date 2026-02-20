@@ -12396,6 +12396,13 @@ function initModalContent() {
         sessionStorage.setItem("bookingCheckout", selectedCheckout);
       }
 
+      // Store room data in sessionStorage for booking modal
+      if (window.selectedRoomData) {
+        sessionStorage.setItem("bookingRoomId", window.selectedRoomData.id || "");
+        sessionStorage.setItem("bookingRoomName", window.selectedRoomData.name || "");
+        sessionStorage.setItem("bookingRoomCapacity", window.selectedRoomData.capacity || "");
+      }
+
       // Close current Fancybox and open booking modal
       Oe.close();
 
@@ -12524,6 +12531,10 @@ function initFormDataHandlers() {
       var capacity = card.dataset.roomCapacity;
       var roomBookings = card.dataset.roomBookings || "[]";
 
+      // Получаем названия комнаты из карточки
+      var roomTitleEl = card.querySelector("[data-room-title], .rooms__card-title");
+      var roomName = roomTitleEl ? roomTitleEl.textContent.trim() : "";
+
       // Собираем данные из hero формы
       var checkinInput = document.querySelector("#checkin-input");
       var checkoutInput = document.querySelector("#checkout-input");
@@ -12531,6 +12542,7 @@ function initFormDataHandlers() {
 
       // Добавляем данные комнаты
       searchParams.append("roomId", roomId);
+      searchParams.append("roomName", roomName);
       searchParams.append("capacity", capacity);
       searchParams.append("bookings", roomBookings);
 
@@ -12556,6 +12568,13 @@ function initFormDataHandlers() {
       var baseSrc = originalSrc.split("?")[0]; // Убираем старые параметры если есть
       var queryString = searchParams.toString();
       card.dataset.src = "".concat(baseSrc, "?").concat(queryString);
+
+      // Сохраняем roomData для дальнейшей передачи в booking-modal
+      window.selectedRoomData = {
+        id: roomId,
+        name: roomName,
+        capacity: capacity
+      };
     });
   });
 }

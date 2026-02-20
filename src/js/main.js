@@ -2921,6 +2921,13 @@ function initModalContent() {
         sessionStorage.setItem("bookingCheckout", selectedCheckout);
       }
 
+      // Store room data in sessionStorage for booking modal
+      if (window.selectedRoomData) {
+        sessionStorage.setItem("bookingRoomId", window.selectedRoomData.id || "");
+        sessionStorage.setItem("bookingRoomName", window.selectedRoomData.name || "");
+        sessionStorage.setItem("bookingRoomCapacity", window.selectedRoomData.capacity || "");
+      }
+
       // Close current Fancybox and open booking modal
       Fancybox.close();
 
@@ -3060,6 +3067,10 @@ function initFormDataHandlers() {
       const capacity = card.dataset.roomCapacity;
       const roomBookings = card.dataset.roomBookings || "[]";
       
+      // Получаем названия комнаты из карточки
+      const roomTitleEl = card.querySelector("[data-room-title], .rooms__card-title");
+      const roomName = roomTitleEl ? roomTitleEl.textContent.trim() : "";
+      
       // Собираем данные из hero формы
       const checkinInput = document.querySelector("#checkin-input");
       const checkoutInput = document.querySelector("#checkout-input");
@@ -3068,6 +3079,7 @@ function initFormDataHandlers() {
       
       // Добавляем данные комнаты
       searchParams.append("roomId", roomId);
+      searchParams.append("roomName", roomName);
       searchParams.append("capacity", capacity);
       searchParams.append("bookings", roomBookings);
       
@@ -3093,6 +3105,13 @@ function initFormDataHandlers() {
       const baseSrc = originalSrc.split("?")[0]; // Убираем старые параметры если есть
       const queryString = searchParams.toString();
       card.dataset.src = `${baseSrc}?${queryString}`;
+      
+      // Сохраняем roomData для дальнейшей передачи в booking-modal
+      window.selectedRoomData = {
+        id: roomId,
+        name: roomName,
+        capacity: capacity,
+      };
     });
   });
 }
