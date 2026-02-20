@@ -1588,6 +1588,12 @@
     cursor: pointer;
     transition: var(--transition-base);
     font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    border: none;
+    text-decoration: none;
   }
 
   .reviews__button:hover {

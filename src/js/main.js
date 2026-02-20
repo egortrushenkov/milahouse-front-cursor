@@ -2954,12 +2954,34 @@ function initModalContent() {
                 // Используем небольшую задержку для гарантии загрузки контента
                 setTimeout(() => {
                   initModalContent();
+                  
+                  // Заполняем поля дат из параметров
+                  const bookingCheckinInput = document.querySelector("#bookingCheckin");
+                  const bookingCheckoutInput = document.querySelector("#bookingCheckout");
+                  
+                  if (bookingCheckinInput && selectedCheckin) {
+                    bookingCheckinInput.value = selectedCheckin;
+                  }
+                  if (bookingCheckoutInput && selectedCheckout) {
+                    bookingCheckoutInput.value = selectedCheckout;
+                  }
                 }, 100);
               },
               reveal: () => {
                 // Дополнительная инициализация при полном открытии модального окна
                 setTimeout(() => {
                   initModalContent();
+                  
+                  // Заполняем поля дат из параметров при reveal
+                  const bookingCheckinInput = document.querySelector("#bookingCheckin");
+                  const bookingCheckoutInput = document.querySelector("#bookingCheckout");
+                  
+                  if (bookingCheckinInput && selectedCheckin) {
+                    bookingCheckinInput.value = selectedCheckin;
+                  }
+                  if (bookingCheckoutInput && selectedCheckout) {
+                    bookingCheckoutInput.value = selectedCheckout;
+                  }
                 }, 50);
               },
             },

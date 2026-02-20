@@ -12424,12 +12424,32 @@ function initModalContent() {
               // Используем небольшую задержку для гарантии загрузки контента
               setTimeout(function () {
                 initModalContent();
+
+                // Заполняем поля дат из параметров
+                var bookingCheckinInput = document.querySelector("#bookingCheckin");
+                var bookingCheckoutInput = document.querySelector("#bookingCheckout");
+                if (bookingCheckinInput && selectedCheckin) {
+                  bookingCheckinInput.value = selectedCheckin;
+                }
+                if (bookingCheckoutInput && selectedCheckout) {
+                  bookingCheckoutInput.value = selectedCheckout;
+                }
               }, 100);
             },
             reveal: function reveal() {
               // Дополнительная инициализация при полном открытии модального окна
               setTimeout(function () {
                 initModalContent();
+
+                // Заполняем поля дат из параметров при reveal
+                var bookingCheckinInput = document.querySelector("#bookingCheckin");
+                var bookingCheckoutInput = document.querySelector("#bookingCheckout");
+                if (bookingCheckinInput && selectedCheckin) {
+                  bookingCheckinInput.value = selectedCheckin;
+                }
+                if (bookingCheckoutInput && selectedCheckout) {
+                  bookingCheckoutInput.value = selectedCheckout;
+                }
               }, 50);
             }
           }
