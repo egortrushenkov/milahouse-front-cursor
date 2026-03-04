@@ -521,7 +521,7 @@ function initDatePickers() {
       const showCalendar = () => {
         try {
           datepicker.show();
-        } catch (err) {}
+        } catch (err) { }
       };
 
       const hideCalendar = () => {
@@ -529,7 +529,7 @@ function initDatePickers() {
           if (datepicker.visible) {
             datepicker.hide();
           }
-        } catch (err) {}
+        } catch (err) { }
       };
 
       if (checkinBtn) {
@@ -720,11 +720,11 @@ function initGallery() {
                 img.style.width = "auto";
                 img.style.height = "auto";
               }
-            } catch (e) {}
+            } catch (e) { }
           },
         },
       });
-    } catch (err) {}
+    } catch (err) { }
   }
 }
 
@@ -876,7 +876,7 @@ function initAdvantages() {
       allowTouchMove: true,
       grabCursor: true,
     });
-  } catch (err) {}
+  } catch (err) { }
 }
 
 const ATTRACTIONS_VISIBLE_DEFAULT = 6;
@@ -1199,6 +1199,50 @@ function initMobileMenu() {
   }
 }
 
+function initPhoneDropdown() {
+  const toggle = document.getElementById("headerPhoneToggle");
+  const dropdown = document.getElementById("headerPhoneDropdown");
+  const wrapper = document.getElementById("headerPhoneWrapper");
+
+  if (!toggle || !dropdown || !wrapper) return;
+
+  // --- защита от повторного запуска ---
+  if (toggle.dataset.phoneDropdownInitialized === "true") {
+    return;
+  }
+  toggle.dataset.phoneDropdownInitialized = "true";
+  // ---------------------------------------
+
+  const open = () => {
+    dropdown.classList.add("is-open");
+    toggle.classList.add("is-open");
+    toggle.setAttribute("aria-expanded", "true");
+    dropdown.setAttribute("aria-hidden", "false");
+  };
+
+  const close = () => {
+    dropdown.classList.remove("is-open");
+    toggle.classList.remove("is-open");
+    toggle.setAttribute("aria-expanded", "false");
+    dropdown.setAttribute("aria-hidden", "true");
+  };
+
+  toggle.addEventListener("click", (e) => {
+    e.stopPropagation();
+    dropdown.classList.contains("is-open") ? close() : open();
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!wrapper.contains(e.target)) {
+      close();
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") close();
+  });
+}
+
 function applyPhoneMask(phoneInput) {
   if (!phoneInput) return;
 
@@ -1277,37 +1321,37 @@ if (!window.isFormsBound) {
   window.isFormsBound = true;
   document.addEventListener("submit", async (e) => {
     const form = e.target;
-    
+
     // Проверяем, что это форма из модалки лида или бронирования
     if (form.matches("#leadForm, #bookingForm, .modal__form")) {
       e.preventDefault();
-      
+
       // Валидация средствами браузера
       if (!form.checkValidity()) {
         form.reportValidity();
         return;
       }
-      
+
       const submitBtn = form.querySelector('[type="submit"]');
       if (submitBtn) submitBtn.disabled = true;
-      
+
       try {
         const formData = new FormData(form);
         const response = await fetch("/ajax/php/submit-handler.php", {
           method: "POST",
           body: formData
         });
-        
+
         let result = {};
         try {
           result = await response.json();
-        } catch(err) {
+        } catch (err) {
           // Fallback если сервер вернул не JSON
           result = { status: response.ok };
         }
-        
+
         Fancybox.close(); // Закрываем текущую форму
-        
+
         if (result.status === true) {
           Fancybox.show([{ src: "ajax/dialogs/success-modal.php", type: "ajax" }], {
             dragToClose: false,
@@ -1322,7 +1366,7 @@ if (!window.isFormsBound) {
             closeClick: "outside"
           });
         }
-        
+
       } catch (error) {
         console.error("Form submit error:", error);
         Fancybox.close();
@@ -2419,7 +2463,7 @@ function initAdminPanel() {
           );
         }
         return bookings;
-      } catch (e) {}
+      } catch (e) { }
     }
 
     // Если не удалось получить данные из data-атрибутов, возвращаем пустой массив
@@ -2536,10 +2580,10 @@ function initAdminPanel() {
         const pricePerNight = Number(booking.price || 0);
         const totalPrice = Number(
           booking.total ||
-            booking.totalPrice ||
-            booking.priceTotal ||
-            pricePerNight ||
-            0,
+          booking.totalPrice ||
+          booking.priceTotal ||
+          pricePerNight ||
+          0,
         );
         totalSum += totalPrice || 0;
 
@@ -2915,14 +2959,14 @@ function initModalContent() {
 
       // Собираем параметры для передачи в booking-modal
       const searchParams = new URLSearchParams();
-      
+
       // Добавляем данные комнаты
       if (window.selectedRoomData) {
         searchParams.append("roomId", window.selectedRoomData.id || "");
         searchParams.append("roomName", window.selectedRoomData.name || "");
         searchParams.append("capacity", window.selectedRoomData.capacity || "");
       }
-      
+
       // Добавляем выбранные даты
       if (selectedCheckin) {
         searchParams.append("checkin", selectedCheckin);
@@ -2937,7 +2981,7 @@ function initModalContent() {
       // Open booking modal after a small delay
       const queryString = searchParams.toString();
       const bookingUrl = queryString ? `ajax/dialogs/booking-modal.php?${queryString}` : "ajax/dialogs/booking-modal.php";
-      
+
       setTimeout(() => {
         Fancybox.show(
           [
@@ -2954,11 +2998,11 @@ function initModalContent() {
                 // Используем небольшую задержку для гарантии загрузки контента
                 setTimeout(() => {
                   initModalContent();
-                  
+
                   // Заполняем поля дат из параметров
                   const bookingCheckinInput = document.querySelector("#bookingCheckin");
                   const bookingCheckoutInput = document.querySelector("#bookingCheckout");
-                  
+
                   if (bookingCheckinInput && selectedCheckin) {
                     bookingCheckinInput.value = selectedCheckin;
                   }
@@ -2971,11 +3015,11 @@ function initModalContent() {
                 // Дополнительная инициализация при полном открытии модального окна
                 setTimeout(() => {
                   initModalContent();
-                  
+
                   // Заполняем поля дат из параметров при reveal
                   const bookingCheckinInput = document.querySelector("#bookingCheckin");
                   const bookingCheckoutInput = document.querySelector("#bookingCheckout");
-                  
+
                   if (bookingCheckinInput && selectedCheckin) {
                     bookingCheckinInput.value = selectedCheckin;
                   }
@@ -3003,7 +3047,7 @@ if (!window.isConsentBound) {
     if (!btn) return;
     e.preventDefault();
     e.stopPropagation();
-    
+
     Fancybox.show(
       [{ src: "ajax/dialogs/consent-modal.php", type: "ajax" }],
       {
@@ -3029,14 +3073,14 @@ function initFormDataHandlers() {
       submitBtn.addEventListener("click", (e) => {
         // Не предотвращаем стандартное поведение - пусть Fancybox сам открывает диалог
         // Просто обновляем data-src с параметрами
-        
+
         // Собираем данные из формы
         const checkinInput = heroForm.querySelector("#checkin-input");
         const checkoutInput = heroForm.querySelector("#checkout-input");
         const counterValues = heroForm.querySelectorAll("[data-counter-value]");
-        
+
         const searchParams = new URLSearchParams();
-        
+
         // Добавляем даты
         if (checkinInput && checkinInput.value) {
           searchParams.append("checkin", checkinInput.value);
@@ -3044,7 +3088,7 @@ function initFormDataHandlers() {
         if (checkoutInput && checkoutInput.value) {
           searchParams.append("checkout", checkoutInput.value);
         }
-        
+
         // Добавляем количество людей
         if (counterValues[0]) {
           searchParams.append("adults", counterValues[0].value);
@@ -3052,11 +3096,11 @@ function initFormDataHandlers() {
         if (counterValues[1]) {
           searchParams.append("children", counterValues[1].value);
         }
-        
+
         // Добавляем скрытые данные (bookings из hero формы)
         const heroBookings = heroForm.dataset.bookings || "[]";
         searchParams.append("bookings", heroBookings);
-        
+
         // Обновляем data-src атрибут для открытия диалога с параметрами
         const originalSrc = submitBtn.dataset.src || "ajax/dialogs/lead-modal.php";
         const baseSrc = originalSrc.split("?")[0]; // Убираем старые параметры если есть
@@ -3074,28 +3118,28 @@ function initFormDataHandlers() {
   roomCards.forEach((card) => {
     card.addEventListener("click", (e) => {
       // Не предотвращаем стандартное поведение - пусть Fancybox сам открывает диалог
-      
+
       // Собираем данные комнаты
       const roomId = card.dataset.roomId;
       const capacity = card.dataset.roomCapacity;
       const roomBookings = card.dataset.roomBookings || "[]";
-      
+
       // Получаем названия комнаты из карточки
       const roomTitleEl = card.querySelector("[data-room-title], .rooms__card-title");
       const roomName = roomTitleEl ? roomTitleEl.textContent.trim() : "";
-      
+
       // Собираем данные из hero формы
       const checkinInput = document.querySelector("#checkin-input");
       const checkoutInput = document.querySelector("#checkout-input");
-      
+
       const searchParams = new URLSearchParams();
-      
+
       // Добавляем данные комнаты
       searchParams.append("roomId", roomId);
       searchParams.append("roomName", roomName);
       searchParams.append("capacity", capacity);
       searchParams.append("bookings", roomBookings);
-      
+
       // Добавляем данные из hero формы если они заполнены
       if (checkinInput && checkinInput.value) {
         searchParams.append("checkin", checkinInput.value);
@@ -3103,7 +3147,7 @@ function initFormDataHandlers() {
       if (checkoutInput && checkoutInput.value) {
         searchParams.append("checkout", checkoutInput.value);
       }
-      
+
       // Добавляем количество взрослых и детей из hero формы
       const counterValues = document.querySelectorAll(".hero__form [data-counter-value]");
       if (counterValues[0] && counterValues[0].value) {
@@ -3112,13 +3156,13 @@ function initFormDataHandlers() {
       if (counterValues[1] && counterValues[1].value) {
         searchParams.append("children", counterValues[1].value);
       }
-      
+
       // Обновляем data-src атрибут для открытия диалога с параметрами
       const originalSrc = card.dataset.src || "";
       const baseSrc = originalSrc.split("?")[0]; // Убираем старые параметры если есть
       const queryString = searchParams.toString();
       card.dataset.src = `${baseSrc}?${queryString}`;
-      
+
       // Сохраняем roomData для дальнейшей передачи в booking-modal
       window.selectedRoomData = {
         id: roomId,
@@ -3229,10 +3273,10 @@ function initSliders() {
       },
       pagination: pagination
         ? {
-            el: pagination,
-            clickable: true,
-            type: "bullets",
-          }
+          el: pagination,
+          clickable: true,
+          type: "bullets",
+        }
         : false,
     });
   }
@@ -3274,6 +3318,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initAboutDropsParallax();
   initEntranceAnimations();
   initMobileMenu();
+  initPhoneDropdown();
   // Modals are now handled via Fancybox
   // initModal, initLeadModal, initStatusModals, initConsentModal, initRoomModal are replaced by Fancybox
   initCookieBanner();

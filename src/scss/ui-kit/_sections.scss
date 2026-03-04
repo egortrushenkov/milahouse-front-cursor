@@ -1741,7 +1741,6 @@
     bottom: 30px !important;
     transform: translateX(-50%);
     z-index: 10;
-    left: 50% !important;
     display: flex;
     gap: 24px;
     justify-content: center;
@@ -2456,7 +2455,7 @@
     font-size: 48px;
     font-weight: 400;
     color: #322E2F;
-    line-height: 1.155;
+    line-height: 160%;
     text-align: center;
     margin-bottom: 40px;
     margin-top: 0;

@@ -40,13 +40,23 @@
                     </div>
                 </div>
                 <div class="header__divider"></div>
-                <div class="header__contact-item">
+                <div class="header__contact-item header__phone-wrapper" id="headerPhoneWrapper">
                     <div class="header__contact-icon">
                         <img src="/img/svg/letter.svg" alt="Телефон">
                     </div>
                     <div class="header__contact-info">
                         <span class="header__contact-label">Телефон</span>
-                        <a href="tel:+79181329575" class="header__contact-value">8 918 132 95 75</a>
+                        <div class="header__phone-row">
+                            <a href="tel:+79181329575" class="header__contact-value">8 918 132 95 75</a>
+                            <button class="header__phone-toggle" id="headerPhoneToggle" aria-label="Другие номера" aria-expanded="false">
+                                <img src="/img/svg/arrow-phone.svg" alt="">
+                            </button>
+                        </div>
+                        <div class="header__phone-dropdown" id="headerPhoneDropdown" aria-hidden="true">
+                            <span class="header__phone-dropdown-label">Звоните также<br>по этим номерам</span>
+                            <a href="tel:+79217220798" class="header__phone-dropdown-number">8 921 722 07 98</a>
+                            <a href="tel:+79933289089" class="header__phone-dropdown-number">8 993 328 90 89</a>
+                        </div>
                     </div>
                 </div>
                 <div class="header__messengers">
@@ -96,6 +106,8 @@
             <div class="header__nav-contact">
                 <div class="header__nav-contact-address">Геленджик, ул.Светлая, 25</div>
                 <a href="tel:+79181329575" class="header__nav-contact-phone">8 918 132 95 75</a>
+                <a href="tel:+79217220798" class="header__nav-contact-phone">8 921 722 07 98</a>
+                <a href="tel:+79933289089" class="header__nav-contact-phone">8 993 328 90 89</a>
                 <div class="header__nav-messengers">
                     <a href="https://t.me/milahouse" target="_blank" rel="noopener noreferrer" class="header__nav-messenger-link">
                         <img src="/img/svg/telegram.svg" alt="Telegram">
@@ -115,7 +127,6 @@
         </div>
     </nav>
 </header>
-
 
     <main class="admin">
         <section class="admin__section admin__section--create">
@@ -334,6 +345,8 @@
                     проживания</p>
                 <div class="contacts__phone">
                     <a href="tel:+79181329575" class="contacts__phone-number" data-contact-phone>8 918 132 95 75</a>
+                    <a href="tel:+79217220798" class="contacts__phone-number">8 921 722 07 98</a>
+                    <a href="tel:+79933289089" class="contacts__phone-number">8 993 328 90 89</a>
                     <div class="contacts__messengers" data-contact-messengers>
                         <a href="https://t.me/provence_b" target="_blank" rel="noopener noreferrer" class="contacts__messenger-link">
                             <img src="/img/svg/telegram.svg" alt="Telegram">
@@ -411,7 +424,6 @@
         <span class="footer__developer">Разработка: Студия КИТ</span>
     </div>
 </footer>
-
 </body>
 
 </html>

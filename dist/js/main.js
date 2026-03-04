@@ -10916,6 +10916,40 @@ function initMobileMenu() {
     });
   }
 }
+function initPhoneDropdown() {
+  var toggle = document.getElementById("headerPhoneToggle");
+  var dropdown = document.getElementById("headerPhoneDropdown");
+  var wrapper = document.getElementById("headerPhoneWrapper");
+  if (!toggle || !dropdown || !wrapper) return;
+  var open = function open() {
+    dropdown.classList.add("is-open");
+    toggle.classList.add("is-open");
+    toggle.setAttribute("aria-expanded", "true");
+    dropdown.setAttribute("aria-hidden", "false");
+  };
+  var close = function close() {
+    dropdown.classList.remove("is-open");
+    toggle.classList.remove("is-open");
+    toggle.setAttribute("aria-expanded", "false");
+    dropdown.setAttribute("aria-hidden", "true");
+  };
+  toggle.addEventListener("click", function (e) {
+    e.stopPropagation();
+    dropdown.classList.contains("is-open") ? close() : open();
+  });
+
+  // Закрытие при клике вне
+  document.addEventListener("click", function (e) {
+    if (!wrapper.contains(e.target)) {
+      close();
+    }
+  });
+
+  // Закрытие по Escape
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") close();
+  });
+}
 function applyPhoneMask(phoneInput) {
   if (!phoneInput) return;
 
@@ -12733,6 +12767,7 @@ document.addEventListener("DOMContentLoaded", function () {
   initAboutDropsParallax();
   initEntranceAnimations();
   initMobileMenu();
+  initPhoneDropdown();
   // Modals are now handled via Fancybox
   // initModal, initLeadModal, initStatusModals, initConsentModal, initRoomModal are replaced by Fancybox
   initCookieBanner();
