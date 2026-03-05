@@ -10921,6 +10921,14 @@ function initPhoneDropdown() {
   var dropdown = document.getElementById("headerPhoneDropdown");
   var wrapper = document.getElementById("headerPhoneWrapper");
   if (!toggle || !dropdown || !wrapper) return;
+
+  // --- защита от повторного запуска ---
+  if (toggle.dataset.phoneDropdownInitialized === "true") {
+    return;
+  }
+  toggle.dataset.phoneDropdownInitialized = "true";
+  // ---------------------------------------
+
   var open = function open() {
     dropdown.classList.add("is-open");
     toggle.classList.add("is-open");
@@ -10937,15 +10945,11 @@ function initPhoneDropdown() {
     e.stopPropagation();
     dropdown.classList.contains("is-open") ? close() : open();
   });
-
-  // Закрытие при клике вне
   document.addEventListener("click", function (e) {
     if (!wrapper.contains(e.target)) {
       close();
     }
   });
-
-  // Закрытие по Escape
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") close();
   });

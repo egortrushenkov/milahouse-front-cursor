@@ -106,10 +106,11 @@
     width: 11px;
     height: 9px;
     transition: transform 0.25s ease;
+    transform: rotate(180deg);
   }
 
   .header__phone-toggle.is-open img {
-    transform: rotate(180deg);
+    transform: rotate(0deg);
   }
 
   .header__phone-dropdown {
