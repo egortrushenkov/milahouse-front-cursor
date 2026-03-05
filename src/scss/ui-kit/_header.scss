@@ -20,7 +20,7 @@
   .header__contact {
     display: flex;
     align-items: center;
-    gap: 24px;
+    gap: 12px;
     flex: 1;
     justify-content: center;
   }
@@ -106,7 +106,7 @@
     width: 11px;
     height: 9px;
     transition: transform 0.25s ease;
-    transform: rotate(-90deg);
+
   }
 
   .header__phone-toggle.is-open img {
